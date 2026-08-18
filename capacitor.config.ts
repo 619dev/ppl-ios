@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'PaperPhoneLite',
   webDir: 'dist',
   server: {
-    // HTTPS scheme is required for WebRTC getUserMedia() and crypto.subtle.
-    iosScheme: 'https',
+    // Serve bundled assets through Capacitor's trusted local URL scheme.
+    iosScheme: 'capacitor',
   },
   plugins: {
     SplashScreen: {

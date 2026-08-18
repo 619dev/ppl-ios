@@ -8,8 +8,23 @@ import Network
 import Tor
 import IPtProxy
 
+private struct PaperPhoneRouter: Router {
+    var basePath = ""
+
+    func route(for path: String) -> String {
+        if path.isEmpty || path == "/" || URL(fileURLWithPath: path).pathExtension.isEmpty {
+            return basePath + "/index.html"
+        }
+        return basePath + path
+    }
+}
+
 @objc(PaperPhoneBridgeViewController)
 public class PaperPhoneBridgeViewController: CAPBridgeViewController {
+    public override func router() -> Router {
+        PaperPhoneRouter()
+    }
+
     public override func capacitorDidLoad() {
         bridge?.registerPluginInstance(SecureStoragePlugin())
         bridge?.registerPluginInstance(KeepAwakePlugin())
@@ -46,6 +61,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
     private var directTimeout: DispatchWorkItem?
     private var webTunnelTimeout: DispatchWorkItem?
     private var transportController: IPtProxyController?
+    private var lastError: String?
 
     @objc func start(_ call: CAPPluginCall) {
         queue.async {
@@ -59,8 +75,12 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     private func state() -> [String: Any] {
-        ["status": status.rawValue, "host": "127.0.0.1", "port": socksPort,
-         "ready": status == .on && proxyReady, "transport": transport]
+        var value: [String: Any] = [
+            "status": status.rawValue, "host": "127.0.0.1", "port": socksPort,
+            "ready": status == .on && proxyReady, "transport": transport
+        ]
+        if let lastError { value["error"] = lastError }
+        return value
     }
 
     private func publish() {
@@ -69,6 +89,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     private func startDirect() {
+        lastError = nil
         guard torThread == nil else {
             if controller != nil { configureDirect() }
             return
@@ -86,39 +107,52 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
                                       appropriateFor: nil, create: true).appendingPathComponent("Tor", isDirectory: true)
             try files.createDirectory(at: root, withIntermediateDirectories: true)
             try files.createDirectory(at: cache, withIntermediateDirectories: true)
-            let socket = root.appendingPathComponent("control.socket")
-            try? files.removeItem(at: socket)
-
             let config = TorConfiguration()
             config.dataDirectory = root
             config.cacheDirectory = cache
-            config.controlSocket = socket
+            config.autoControlPort = true
             config.socksPort = UInt(socksPort)
             config.ignoreMissingTorrc = true
             config.cookieAuthentication = true
             config.avoidDiskWrites = true
             config.clientOnly = true
             config.arguments.addObjects(from: ["--SafeSocks", "1", "--TestSocks", "1"])
+            guard let controlPortFile = config.controlPortFile else {
+                throw NSError(domain: "TorPlugin", code: 1,
+                              userInfo: [NSLocalizedDescriptionKey: "Tor control port file is unavailable"])
+            }
+            try? files.removeItem(at: controlPortFile)
             configuration = config
             let thread = TorThread(configuration: config)
             torThread = thread
             thread.start()
-            connectController(socket: socket, attempt: 0)
+            connectController(controlPortFile: controlPortFile, attempt: 0)
         } catch {
             failWebTunnel(error)
         }
     }
 
-    private func connectController(socket: URL, attempt: Int) {
-        guard attempt < 100, let config = configuration else {
+    private func connectController(controlPortFile: URL, attempt: Int) {
+        guard attempt < 300, let config = configuration else {
             failWebTunnel(NSError(domain: "TorPlugin", code: 1,
-                                   userInfo: [NSLocalizedDescriptionKey: "Tor control socket did not become ready"]))
+                                   userInfo: [NSLocalizedDescriptionKey: "Tor control port did not become ready"]))
             return
         }
-        let candidate = TorController(socketURL: socket)
-        do {
-            try candidate.connect()
-            guard let cookie = config.cookie else { throw NSError(domain: "TorPlugin", code: 2) }
+        guard let attributes = try? FileManager.default.attributesOfItem(atPath: controlPortFile.path),
+              (attributes[.size] as? NSNumber)?.intValue ?? 0 > 0 else {
+            queue.asyncAfter(deadline: .now() + 0.1) {
+                self.connectController(controlPortFile: controlPortFile, attempt: attempt + 1)
+            }
+            return
+        }
+        guard let cookie = config.cookie, !cookie.isEmpty else {
+            queue.asyncAfter(deadline: .now() + 0.1) {
+                self.connectController(controlPortFile: controlPortFile, attempt: attempt + 1)
+            }
+            return
+        }
+        let candidate = TorController(controlPortFile: controlPortFile)
+        if candidate.isConnected {
             candidate.authenticate(with: cookie) { success, error in
                 self.queue.async {
                     guard success else { self.failWebTunnel(error ?? NSError(domain: "TorPlugin", code: 3)); return }
@@ -127,8 +161,10 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
                     self.configureDirect()
                 }
             }
-        } catch {
-            queue.asyncAfter(deadline: .now() + 0.1) { self.connectController(socket: socket, attempt: attempt + 1) }
+        } else {
+            queue.asyncAfter(deadline: .now() + 0.1) {
+                self.connectController(controlPortFile: controlPortFile, attempt: attempt + 1)
+            }
         }
     }
 
@@ -165,6 +201,19 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func applyWebKitProxy() {
         DispatchQueue.main.async {
+            guard let port = NWEndpoint.Port(rawValue: UInt16(self.socksPort)) else {
+                self.queue.async {
+                    self.failWebTunnel(NSError(domain: "TorPlugin", code: 10,
+                                               userInfo: [NSLocalizedDescriptionKey: "Invalid Tor SOCKS port"]))
+                }
+                return
+            }
+            var proxy = ProxyConfiguration(socksv5Proxy: .hostPort(host: "127.0.0.1", port: port))
+            // Never bypass Tor if the local SOCKS listener is unavailable.
+            proxy.allowFailover = false
+            let dataStore = self.bridge?.webView?.configuration.websiteDataStore
+                ?? WKWebsiteDataStore.default()
+            dataStore.proxyConfigurations = [proxy]
             self.queue.async {
                 self.proxyReady = true
                 self.status = .on
@@ -174,6 +223,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
     }
 
     private func startWebTunnelFallback() {
+        lastError = nil
         status = .fetchingWebTunnel
         transport = "webtunnel"
         proxyReady = false
@@ -196,6 +246,8 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
         request.httpMethod = "POST"
         request.timeoutInterval = 15
         request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue("PaperPhoneLite/3.0.8 (iOS)", forHTTPHeaderField: "User-Agent")
         request.httpBody = Data(#"{"country":"cn","transports":["webtunnel"]}"#.utf8)
         let config = URLSessionConfiguration.ephemeral
         config.waitsForConnectivity = false
@@ -228,8 +280,13 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
         guard let value = input?.trimmingCharacters(in: .whitespacesAndNewlines),
               value.hasPrefix("webtunnel "), !value.contains("\n"), !value.contains("\r"),
               value.contains(" url=https://"),
-              value.range(of: #"\sver=[0-9.]+(?:\s.*)?$"#, options: .regularExpression) != nil else { return nil }
-        return value
+              value.range(of: #"\sver=[0-9.]+(?:\s|$)"#, options: .regularExpression) != nil else { return nil }
+        // IPtProxy's randomized uTLS profile can select hybrid curves that its
+        // mobile Go runtime cannot generate. Standard TLS is explicitly
+        // supported by the WebTunnel bridge-line format and avoids that crash.
+        return value.range(of: #"\sutls="#, options: .regularExpression) == nil
+            ? value + " utls=none"
+            : value
     }
 
     private func configureWebTunnel(bridge: String) {
@@ -238,13 +295,16 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
                 .appendingPathComponent("webtunnel-pt", isDirectory: true)
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
             if transportController == nil {
-                transportController = IPtProxyController(directory.path, enableLogging: true,
+                transportController = IPtProxyController(directory.path, enableLogging: false,
                                                          unsafeLogging: false, logLevel: "INFO", transportEvents: nil)
             }
             try transportController?.start(IPtProxyWebtunnel, proxy: nil)
             let port = transportController?.port(IPtProxyWebtunnel) ?? 0
             guard (1...65535).contains(port), let controller else { throw NSError(domain: "TorPlugin", code: 7) }
-            let quote: (String) -> String = { "\"" + $0.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\"" }
+            let quote: (String) -> String = {
+                "\"" + $0.replacingOccurrences(of: "\\", with: "\\\\")
+                    .replacingOccurrences(of: "\"", with: "\\\"") + "\""
+            }
             controller.setConfs([
                 ["key": "UseBridges", "value": "1"],
                 ["key": "ClientTransportPlugin", "value": quote("webtunnel socks5 127.0.0.1:\(port)")],
@@ -268,6 +328,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
 
     private func failWebTunnel(_ error: Error) {
         NSLog("[TorPlugin] %@", error.localizedDescription)
+        lastError = error.localizedDescription
         status = .webTunnelError
         proxyReady = false
         publish()

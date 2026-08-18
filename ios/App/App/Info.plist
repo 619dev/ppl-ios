@@ -45,9 +45,14 @@
 	<string>PaperPhoneLite needs permission to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>PaperPhoneLite needs photo library access to send images in chat.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Onion HTTP is end-to-end protected by Tor and never sent to clearnet. -->
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>remote-notification</string>
 		<string>fetch</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

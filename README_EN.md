@@ -4,9 +4,11 @@ The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
+Current iOS release: `3.0.8 (46)`; bundle ID: `com.fm619tech.paperphonelite`.
+
 ## Privacy and network model
 
-Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback. The login page starts Tor automatically; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically.
+Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback for the application server. The login and registration screen starts Tor automatically; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically. WebTunnel assists Tor bootstrap only; application traffic continues to reach the onion service through the embedded Tor client.
 
 This project does not use Apple Push Notification service (APNs) at all. It does not register APNs device tokens or send device tokens or notification payloads to Apple, an official relay, or any other APNs relay. APNs requires delivery through clearnet push infrastructure and a relay, which conflicts with the trust and metadata boundary of a Tor-only deployment. When iOS suspends or terminates the app, it receives no remote background message notifications. While the app is running and connected, WebSocket events may produce on-device local notifications and in-app alerts.
 
@@ -22,6 +24,7 @@ The project also integrates no FCM, Firebase, OneSignal, or Web Push. Android ma
 - Message synchronization, offline cache, expiration, and cache clearing
 - QR features, TOTP two-factor authentication, recovery codes, and device sessions
 - Multiple servers and proxies with Tor-only onion-address validation
+- Automatic Tor bootstrap before login or registration, with automatic WebTunnel fallback
 - Chinese, English, Japanese, Korean, French, German, Russian, and Spanish UI
 - iOS Keychain protection and an iOS share extension
 - Local notifications and unread badges while the app is running
@@ -70,6 +73,8 @@ cd ios/App && pod install
 ```
 
 Open `ios/App/App.xcworkspace` in Xcode (not the `.xcodeproj`), configure your own signing, and run. Never commit `.p8`, `.mobileprovision`, IPA, or other signing material to the source repository.
+
+The App Store build uses `com.fm619tech.paperphonelite`; its Share Extension uses `com.fm619tech.paperphonelite.share`. Archiving and upload require the distributor's Apple Distribution certificate, matching App Store provisioning profiles, and App Store Connect access.
 
 ## Data and self-hosting responsibility
 

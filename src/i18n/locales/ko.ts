@@ -108,7 +108,7 @@ export const ko: Record<string, string> = {
   'tor.starting': 'Tor 회로 연결 중…',
   'tor.ready': 'Tor 정상',
   'tor.ready_detail': 'Tor 회로가 연결되었고 앱 트래픽이 내장 Tor를 통과합니다. 이제 로그인하거나 가입할 수 있습니다.',
-  'tor.required_notice': '먼저 내장 Tor를 시작하세요. Android VPN이 Tor의 외부 연결을 전달하므로 여기서 127.0.0.1:10808을 설정할 필요가 없습니다.',
+  'tor.required_notice': '먼저 내장 Tor를 시작하세요. 앱이 .onion 연결을 자동으로 Tor를 통해 전달하므로 여기서 로컬 프록시 주소를 설정할 필요가 없습니다.',
   'tor.required_before_auth': 'Tor가 준비되지 않았습니다. Tor를 시작하고 정상 상태를 기다리세요.',
   'tor.start_failed': 'Tor를 시작하지 못했습니다. 네트워크 또는 VPN을 확인하세요.',
   'tor.fetching_webtunnel': 'Tor 직접 연결이 차단되었습니다. Tor Project에서 최신 WebTunnel을 가져오는 중…',

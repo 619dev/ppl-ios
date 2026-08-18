@@ -4,9 +4,11 @@ PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Ca
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
+当前 iOS 版本：`3.0.8 (46)`；Bundle ID：`com.fm619tech.paperphonelite`。
+
 ## 隐私与网络模型
 
-PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的公开 IP 由 Tor 隐藏，Android 与 iOS 客户端均使用内嵌 Tor 访问 `.onion` 地址，不提供明网回退。登录页会自动启动 Tor；直连 20 秒仍未建链时，客户端会从 Tor Project Moat 获取 WebTunnel 网桥并自动切换。
+PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的公开 IP 由 Tor 隐藏，Android 与 iOS 客户端均使用内嵌 Tor 访问 `.onion` 地址，不提供应用服务器的明网回退。登录或注册页会自动启动 Tor；直连 20 秒仍未建链时，客户端会从 Tor Project Moat 获取 WebTunnel 网桥并自动切换。WebTunnel 仅用于帮助建立 Tor 线路，应用业务流量仍通过内嵌 Tor 访问 onion service。
 
 本项目完全不使用 Apple Push Notification service（APNs），不会注册 APNs 设备令牌，也不会把设备令牌或通知载荷发送给 Apple、官方中继或其他 APNs 中继。原因是 APNs 必须通过明网推送基础设施及中继交付，这会破坏 Tor-only 部署的信任和元数据边界。应用被 iOS 挂起或终止后不会收到后台远程消息通知；应用处于运行和连接状态时，可根据 WebSocket 收到的事件生成本地通知和应用内提醒。
 
@@ -22,6 +24,7 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 - 消息同步、离线缓存、自动删除和缓存清理
 - 二维码、TOTP 两步验证、恢复码和设备会话管理
 - 多服务器与代理配置、Tor-only onion 地址校验
+- 登录和注册前自动建立 Tor 线路，并自动获取 WebTunnel 网桥回退
 - 中、英、日、韩、法、德、俄、西八种界面语言
 - iOS Keychain 身份密钥保护、系统分享扩展
 - 应用运行时的本地通知和未读角标
@@ -70,6 +73,8 @@ cd ios/App && pod install
 ```
 
 随后使用 Xcode 打开 `ios/App/App.xcworkspace`（不要打开 `.xcodeproj`），配置自己的签名并运行。任何 `.p8`、`.mobileprovision`、IPA 和其他签名材料都不应提交到源码仓库。
+
+App Store 发行包使用 Bundle ID `com.fm619tech.paperphonelite`；分享扩展使用 `com.fm619tech.paperphonelite.share`。归档和上传需要发行者自己的 Apple Distribution 证书、对应 App Store provisioning profiles，以及 App Store Connect 权限。
 
 ## 数据与自托管责任
 

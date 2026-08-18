@@ -110,7 +110,7 @@ export const de: Record<string, string> = {
   'tor.starting': 'Tor-Verbindung wird aufgebaut…',
   'tor.ready': 'Tor ist bereit',
   'tor.ready_detail': 'Eine Tor-Verbindung besteht und der App-Verkehr läuft über das integrierte Tor. Anmeldung oder Registrierung ist jetzt möglich.',
-  'tor.required_notice': 'Starten Sie zuerst das integrierte Tor. Ein Android-VPN kann den ausgehenden Tor-Verkehr transportieren; 127.0.0.1:10808 muss hier nicht eingerichtet werden.',
+  'tor.required_notice': 'Starten Sie zuerst das integrierte Tor. Die App leitet .onion-Verbindungen automatisch darüber; hier ist keine lokale Proxy-Adresse erforderlich.',
   'tor.required_before_auth': 'Tor ist noch nicht bereit. Starten Sie Tor und warten Sie auf den Bereitschaftsstatus.',
   'tor.start_failed': 'Tor konnte nicht gestartet werden. Prüfen Sie Netzwerk oder VPN und versuchen Sie es erneut.',
   'tor.fetching_webtunnel': 'Direktes Tor ist blockiert. Der neueste WebTunnel wird vom Tor Project abgerufen…',

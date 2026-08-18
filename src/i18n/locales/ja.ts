@@ -107,7 +107,7 @@ export const ja: Record<string, string> = {
   'tor.starting': 'Tor 回線を構築中…',
   'tor.ready': 'Tor は正常です',
   'tor.ready_detail': 'Tor 回線が確立され、アプリ通信は内蔵 Tor を経由しています。ログインまたは登録できます。',
-  'tor.required_notice': '先に内蔵 Tor を起動してください。Android VPN は Tor の外向き通信を運ぶため、ここで 127.0.0.1:10808 を設定する必要はありません。',
+  'tor.required_notice': '先に内蔵 Tor を起動してください。アプリは .onion への接続を自動的に Tor 経由にするため、ここでローカルプロキシを設定する必要はありません。',
   'tor.required_before_auth': 'Tor の準備ができていません。Tor を起動し、正常になるまで待ってください。',
   'tor.start_failed': 'Tor を起動できませんでした。ネットワークまたは VPN を確認してください。',
   'tor.fetching_webtunnel': 'Tor 直結が遮断されています。Tor Project から最新の WebTunnel を取得中…',

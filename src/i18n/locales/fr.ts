@@ -110,7 +110,7 @@ export const fr: Record<string, string> = {
   'tor.starting': 'Création du circuit Tor…',
   'tor.ready': 'Tor est prêt',
   'tor.ready_detail': "Un circuit Tor est établi et le trafic de l’application passe par Tor intégré. Vous pouvez vous connecter ou vous inscrire.",
-  'tor.required_notice': "Démarrez d’abord Tor intégré. Un VPN Android peut transporter le trafic sortant de Tor ; ne configurez pas 127.0.0.1:10808 ici.",
+  'tor.required_notice': "Démarrez d’abord Tor intégré. L’app achemine automatiquement les connexions .onion via Tor ; aucune adresse de proxy local n’est nécessaire ici.",
   'tor.required_before_auth': "Tor n’est pas prêt. Démarrez Tor et attendez son état opérationnel.",
   'tor.start_failed': 'Échec du démarrage de Tor. Vérifiez le réseau ou le VPN puis réessayez.',
   'tor.fetching_webtunnel': 'La connexion Tor directe est bloquée. Récupération du dernier WebTunnel auprès de Tor Project…',

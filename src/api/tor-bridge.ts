@@ -8,6 +8,7 @@ export interface TorState {
   port: number
   ready: boolean
   transport: 'direct' | 'webtunnel'
+  error?: string
 }
 
 interface TorPluginInterface {

@@ -4,6 +4,24 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.8 (iOS build 46) — 2026-08-19
+
+- Rebased the iOS client on PaperPhoneLite 3.0.8 and aligned its application identity with `com.fm619tech.paperphonelite`.
+- Embedded Tor for all onion-service application traffic. Login and registration now start Tor automatically, then obtain and activate a Tor Project Moat WebTunnel bridge when direct bootstrap does not complete in time.
+- Corrected native WebView routing so registration and login requests use the embedded Tor SOCKS path instead of failing through the default network stack.
+- Removed APNs integration and all remote-push claims. Notifications are local only and require the app to have already received the event while running.
+- Updated the app icon and light/dark launch artwork to match the Android PaperPhoneLite client.
+- Updated multilingual Tor/WebTunnel status and error copy, privacy disclosures, licensing notes, build instructions, and release documentation.
+
+- iOS 客户端重新基于 PaperPhoneLite 3.0.8 整合，应用标识统一为 `com.fm619tech.paperphonelite`。
+- 所有 onion service 业务流量均通过内嵌 Tor。登录和注册页会自动启动 Tor；直连未及时完成时，自动从 Tor Project Moat 获取并启用 WebTunnel 网桥。
+- 修正原生 WebView 路由，使注册和登录请求走内嵌 Tor SOCKS 通道，不再错误使用系统默认网络栈而出现 `Load failed`。
+- 移除 APNs 集成及所有远程推送表述；通知仅在应用运行且已收到事件后由设备本地生成。
+- App 图标及浅色、深色启动画面与 Android PaperPhoneLite 客户端保持一致。
+- 更新八种语言的 Tor/WebTunnel 状态和错误提示，以及隐私声明、许可说明、构建步骤和发布文档。
+
+---
+
 ## 2.4.7
 
 - Fixed E2EE safety-number mismatches by deriving both views from the same pair of published identity keys; text appearance and its extra password remain independent of the E2EE safety number.
