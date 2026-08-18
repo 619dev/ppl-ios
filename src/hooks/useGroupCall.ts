@@ -229,7 +229,7 @@ export function useGroupCall(userId: string | undefined) {
       setCallId(data.call_id); setGroupId(data.group_id); setIsVideo(!!data.is_video)
       setInviterName(data.from_nickname || data.from || ''); setInviterAvatar(data.from_avatar || '')
       setGroupName(data.group_name || ''); setStatus('ringing'); playCallRingtone()
-      showBrowserNotification('PaperPhonePlus', t(data.is_video ? 'meeting.video_title' : 'meeting.voice_title'), () => window.focus())
+      showBrowserNotification('PaperPhoneLite', t(data.is_video ? 'meeting.video_title' : 'meeting.voice_title'), () => window.focus())
     })
     return off
   }, [t, userId])

@@ -39,8 +39,8 @@ export default function PrivacyPolicy() {
             : 'Sender and recipient or group identifiers, message identifiers, type, time, delivery/read status, client sequence, expiry settings, key version, and information needed for WebSocket operation, synchronization, and deduplication. The project has no social feed, timeline, public-post, or report-review data.'}</p>
           <h4>{zh ? '设备与会话数据' : 'Device and session data'}</h4>
           <p>{zh
-            ? '设备名称和类型、操作系统、客户端或浏览器标识、会话标识、登录和最后活动时间、刷新令牌哈希，以及服务器可见的连接信息。Tor 用于降低来源 IP 暴露，但服务器、设备或推送服务仍可能产生其他可关联元数据。'
-            : 'Device name and type, operating system, client or browser identifier, session identifier, login and last-active times, refresh-token hash, and connection information visible to the server. Tor reduces source-IP exposure, but the server, device, or push provider may still create other linkable metadata.'}</p>
+            ? '设备名称和类型、操作系统、客户端或浏览器标识、会话标识、登录和最后活动时间、刷新令牌哈希，以及服务器可见的连接信息。Tor 用于降低来源 IP 暴露，但服务器、设备，以及用户可选的 ntfy 实例仍可能产生其他可关联元数据。iOS 不使用 APNs。'
+            : 'Device name and type, operating system, client or browser identifier, session identifier, login and last-active times, refresh-token hash, and connection information visible to the server. Tor reduces source-IP exposure, but the server, device, and an optional user-selected ntfy instance may still create other linkable metadata. iOS does not use APNs.'}</p>
         </Section>
 
         <Section icon={<Lock size={20} />} title={zh ? '3. 消息加密与限制' : '3. Message Encryption and Limits'}>
@@ -54,14 +54,14 @@ export default function PrivacyPolicy() {
 
         <Section icon={<Server size={20} />} title={zh ? '4. 文件与数据存储' : '4. Files and Data Storage'}>
           <p>{zh
-            ? '上传的图片、视频、语音和文档保存在您选择服务器的持久卷中，由 Rust 服务端传输，单文件上限为 500MB；本项目不使用 Cloudflare R2。客户端还会在 localStorage 和 IndexedDB 中保存登录状态、设置、本地密钥、联系人、群组、消息及媒体缓存。服务器运营者负责存储位置、备份、访问控制和保留期限。'
-            : 'Uploaded images, video, voice, and documents remain on the selected server’s persistent volume and are transferred by the Rust server, with a 500MB per-file limit; the project does not use Cloudflare R2. The client also stores login state, settings, local keys, contacts, groups, messages, and media cache in localStorage and IndexedDB. The server operator is responsible for storage location, backups, access control, and retention.'}</p>
+            ? '上传的图片、视频、语音和文档保存在您选择服务器的持久卷中，由 Rust 服务端传输，单文件上限为 500MB；本项目不使用 Cloudflare R2。客户端在 localStorage、IndexedDB 和 Cache Storage 中保存登录状态、设置、联系人、群组、消息及媒体缓存；iOS 身份私钥保存在 Keychain 中。服务器运营者负责存储位置、备份、访问控制和保留期限。'
+            : 'Uploaded images, video, voice, and documents remain on the selected server’s persistent volume and are transferred by the Rust server, with a 500MB per-file limit; the project does not use Cloudflare R2. The client stores login state, settings, contacts, groups, messages, and media cache in localStorage, IndexedDB, and Cache Storage; iOS identity private keys are stored in Keychain. The server operator is responsible for storage location, backups, access control, and retention.'}</p>
         </Section>
 
         <Section icon={<Network size={20} />} title={zh ? '5. Tor 网络' : '5. Tor Network'}>
           <p>{zh
-            ? '生产客户端必须内嵌 Tor，等待 bootstrap 完成，并仅通过隔离的代理连接 v3 .onion 服务，不允许明网回退。Tor 旨在隐藏来源 IP 和服务器公开 IP，但无法保证绝对匿名，也无法消除设备指纹、账号行为、通知服务或用户主动披露形成的关联。Tor 软件和网络由 Tor Project 及其参与者独立提供。'
-            : 'Production clients must embed Tor, wait for bootstrap, and connect only to a v3 .onion service through an isolated proxy with no clearnet fallback. Tor is intended to conceal source and public server IP addresses but cannot guarantee absolute anonymity or eliminate linkage from device fingerprints, account behavior, notification services, or voluntary disclosure. Tor software and the network are independently provided by the Tor Project and its participants.'}</p>
+            ? '生产客户端仅能通过内嵌 Tor 连接 v3 .onion 服务，不允许明网回退。登录页会自动启动 Tor；若直连失败，客户端会通过普通 HTTPS 向 Tor Project Moat 请求 WebTunnel 网桥并缓存有效结果。由于此请求发生在 Tor 建链前，Tor Project 的网桥服务和网络提供商可能看到来源 IP、时间及常规 HTTPS 元数据，但不会收到账号、聊天内容或 onion 服务器地址。Tor 不能保证绝对匿名，也无法消除设备指纹、账号行为或用户主动披露形成的关联。Tor 软件和网络由 Tor Project 及其参与者独立提供。'
+            : 'Production clients connect only to v3 .onion services through embedded Tor, with no clearnet fallback. The login page starts Tor automatically; if direct connection fails, the client requests a WebTunnel bridge from Tor Project Moat over ordinary HTTPS and caches a valid result. Because this request occurs before Tor is connected, Tor Project’s bridge service and network providers may see the source IP, time, and ordinary HTTPS metadata, but receive no account data, chat content, or onion-server address. Tor cannot guarantee absolute anonymity or eliminate linkage from device fingerprints, account behavior, or voluntary disclosure. Tor software and the network are independently provided by the Tor Project and its participants.'}</p>
         </Section>
 
         <Section icon={<Bell size={20} />} title={zh ? '6. 通知服务与第三方' : '6. Notifications and Third Parties'}>
@@ -94,7 +94,7 @@ export default function PrivacyPolicy() {
             : 'Measures include encryption, password hashing, session revocation, and Tor-only connections, but no system can guarantee absolute security. This Policy may change with a release; material changes will be published in the app or repository. Project-level questions may be sent to 4722522@gmail.com; instance-specific data requests should first go to the server operator you selected.'}</p>
         </Section>
 
-        <div className="privacy-footer"><p>© {new Date().getFullYear()} FM619 Technolog LTD.</p></div>
+        <div className="privacy-footer"><p>© {new Date().getFullYear()} FM619 Technology LTD.</p></div>
       </div>
     </div>
   )

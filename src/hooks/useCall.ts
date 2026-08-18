@@ -388,7 +388,7 @@ export function useCall(userId: string | undefined) {
       setCallState('incoming')
       playCallRingtone()
       showBrowserNotification(
-        'PaperPhonePlus',
+        'PaperPhoneLite',
         `Incoming ${data.is_video ? 'Video Call' : 'Voice Call'}`,
         () => window.focus(),
       )

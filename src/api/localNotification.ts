@@ -4,10 +4,9 @@
  * Used on iOS (Capacitor) to show system-level notifications when the app
  * receives a message via WebSocket while in the foreground or background.
  *
- * This supplements native APNS push notifications:
- * - APNS: handles notifications when the app is fully killed (server-side push)
- * - Local Notifications: handles notifications when the app is running and
- *   receives a WebSocket message (works in simulator too!)
+ * These notifications are created entirely on-device from WebSocket events
+ * while the app is running. The project does not register for APNs and cannot
+ * receive remote notifications after iOS has suspended or terminated it.
  *
  * On web platforms, this is a no-op — browser Notification API is used instead.
  */

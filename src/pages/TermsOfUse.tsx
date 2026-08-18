@@ -29,8 +29,8 @@ export default function TermsOfUse() {
 
         <Section icon={<Network size={20} />} title={zh ? '2. 服务与发行范围' : '2. Service and Distribution'}>
           <p>{zh
-            ? '本项目提供私聊、群聊、联系人、加密消息、语音消息、附件、消息同步、定时删除、二维码、两步验证和拉黑；Android 还可使用 ntfy 接收后台通知。不提供朋友圈、时间线、公开内容发布、举报审核后台、语音或视频通话。iOS 不使用 APNs，当前不提供系统后台远程通知；Android 与 iOS 均不集成 Apple 或 Google 推送服务。生产客户端必须内嵌 Tor，并仅连接由用户选择的 v3 .onion 服务地址。iOS 版本计划通过 Apple App Store 发布；Android APK 仅通过项目 GitHub Releases 发布，不通过 Google Play。'
-            : 'The project provides private and group chat, contacts, encrypted messaging, voice messages, attachments, synchronization, expiring messages, QR features, two-factor authentication, and blocking; Android can additionally use ntfy for background notifications. It provides no social feed, timeline, public publishing, report-review dashboard, or voice/video calling. iOS does not use APNs and currently provides no system background remote notifications; neither Android nor iOS integrates Apple or Google push services. Production clients must embed Tor and connect only to a user-selected v3 .onion server. iOS distribution is intended for the Apple App Store, while Android APKs are distributed only through the project’s GitHub Releases and not Google Play.'}</p>
+            ? '本项目提供私聊、群聊、联系人、加密消息、语音消息、附件、消息同步、定时删除、二维码、两步验证和拉黑；Android 还可使用 ntfy 接收后台通知。不提供朋友圈、时间线、公开内容发布、举报审核后台、语音或视频通话。iOS 不使用 APNs，当前不提供系统后台远程通知；Android 与 iOS 均不集成 Apple 或 Google 推送服务。生产客户端仅通过内嵌 Tor 连接用户选择的 v3 .onion 服务，并可在直连失败时自动使用 WebTunnel。iOS 版本计划通过 Apple App Store 发布；Android APK 仅通过项目 GitHub Releases 发布，不通过 Google Play。'
+            : 'The project provides private and group chat, contacts, encrypted messaging, voice messages, attachments, synchronization, expiring messages, QR features, two-factor authentication, and blocking; Android can additionally use ntfy for background notifications. It provides no social feed, timeline, public publishing, report-review dashboard, or voice/video calling. iOS does not use APNs and currently provides no system background remote notifications; neither Android nor iOS integrates Apple or Google push services. Production clients connect only to a user-selected v3 .onion server through embedded Tor and can switch to WebTunnel automatically when direct connection fails. iOS distribution is intended for the Apple App Store, while Android APKs are distributed only through the project’s GitHub Releases and not Google Play.'}</p>
         </Section>
 
         <Section icon={<Lock size={20} />} title={zh ? '3. 账号、密钥与安全责任' : '3. Accounts, Keys, and Security'}>
@@ -69,7 +69,7 @@ export default function TermsOfUse() {
             : 'These Terms may be updated with a release and published in the app or repository. Continued use after a material change takes effect signifies acceptance; you may stop using the app and ask the chosen server operator to delete your account. If one provision is unenforceable, the remainder stays effective. Questions may be sent to 4722522@gmail.com.'}</p>
         </Section>
 
-        <div className="privacy-footer"><p>© {new Date().getFullYear()} FM619 Technolog LTD.</p></div>
+        <div className="privacy-footer"><p>© {new Date().getFullYear()} FM619 Technology LTD.</p></div>
       </div>
     </div>
   )

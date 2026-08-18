@@ -3,6 +3,10 @@ import Capacitor
 import UserNotifications
 import CryptoKit
 import Security
+import WebKit
+import Network
+import Tor
+import IPtProxy
 
 @objc(PaperPhoneBridgeViewController)
 public class PaperPhoneBridgeViewController: CAPBridgeViewController {
@@ -10,6 +14,263 @@ public class PaperPhoneBridgeViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(SecureStoragePlugin())
         bridge?.registerPluginInstance(KeepAwakePlugin())
         bridge?.registerPluginInstance(SharedFilePlugin())
+        bridge?.registerPluginInstance(TorPlugin())
+    }
+}
+
+@objc(TorPlugin)
+public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "TorPlugin"
+    public let jsName = "TorPlugin"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "getStatus", returnType: CAPPluginReturnPromise)
+    ]
+
+    private enum Status: String {
+        case off = "OFF", starting = "STARTING", on = "ON"
+        case fetchingWebTunnel = "FETCHING_WEBTUNNEL"
+        case startingWebTunnel = "STARTING_WEBTUNNEL"
+        case webTunnelError = "WEBTUNNEL_ERROR"
+    }
+
+    private let socksPort = 9050
+    private let queue = DispatchQueue(label: "com.fm619tech.paperphonelite.tor")
+    private var status: Status = .off
+    private var transport = "direct"
+    private var proxyReady = false
+    private var configuration: TorConfiguration?
+    private var torThread: TorThread?
+    private var controller: TorController?
+    private var circuitObserver: Any?
+    private var directTimeout: DispatchWorkItem?
+    private var webTunnelTimeout: DispatchWorkItem?
+    private var transportController: IPtProxyController?
+
+    @objc func start(_ call: CAPPluginCall) {
+        queue.async {
+            if self.status == .off || self.status == .webTunnelError { self.startDirect() }
+            call.resolve(self.state())
+        }
+    }
+
+    @objc func getStatus(_ call: CAPPluginCall) {
+        queue.async { call.resolve(self.state()) }
+    }
+
+    private func state() -> [String: Any] {
+        ["status": status.rawValue, "host": "127.0.0.1", "port": socksPort,
+         "ready": status == .on && proxyReady, "transport": transport]
+    }
+
+    private func publish() {
+        let value = state()
+        DispatchQueue.main.async { self.notifyListeners("statusChange", data: value) }
+    }
+
+    private func startDirect() {
+        guard torThread == nil else {
+            if controller != nil { configureDirect() }
+            return
+        }
+        status = .starting
+        transport = "direct"
+        proxyReady = false
+        publish()
+
+        do {
+            let files = FileManager.default
+            let root = try files.url(for: .applicationSupportDirectory, in: .userDomainMask,
+                                     appropriateFor: nil, create: true).appendingPathComponent("Tor", isDirectory: true)
+            let cache = try files.url(for: .cachesDirectory, in: .userDomainMask,
+                                      appropriateFor: nil, create: true).appendingPathComponent("Tor", isDirectory: true)
+            try files.createDirectory(at: root, withIntermediateDirectories: true)
+            try files.createDirectory(at: cache, withIntermediateDirectories: true)
+            let socket = root.appendingPathComponent("control.socket")
+            try? files.removeItem(at: socket)
+
+            let config = TorConfiguration()
+            config.dataDirectory = root
+            config.cacheDirectory = cache
+            config.controlSocket = socket
+            config.socksPort = UInt(socksPort)
+            config.ignoreMissingTorrc = true
+            config.cookieAuthentication = true
+            config.avoidDiskWrites = true
+            config.clientOnly = true
+            config.arguments.addObjects(from: ["--SafeSocks", "1", "--TestSocks", "1"])
+            configuration = config
+            let thread = TorThread(configuration: config)
+            torThread = thread
+            thread.start()
+            connectController(socket: socket, attempt: 0)
+        } catch {
+            failWebTunnel(error)
+        }
+    }
+
+    private func connectController(socket: URL, attempt: Int) {
+        guard attempt < 100, let config = configuration else {
+            failWebTunnel(NSError(domain: "TorPlugin", code: 1,
+                                   userInfo: [NSLocalizedDescriptionKey: "Tor control socket did not become ready"]))
+            return
+        }
+        let candidate = TorController(socketURL: socket)
+        do {
+            try candidate.connect()
+            guard let cookie = config.cookie else { throw NSError(domain: "TorPlugin", code: 2) }
+            candidate.authenticate(with: cookie) { success, error in
+                self.queue.async {
+                    guard success else { self.failWebTunnel(error ?? NSError(domain: "TorPlugin", code: 3)); return }
+                    self.controller = candidate
+                    self.observeCircuits()
+                    self.configureDirect()
+                }
+            }
+        } catch {
+            queue.asyncAfter(deadline: .now() + 0.1) { self.connectController(socket: socket, attempt: attempt + 1) }
+        }
+    }
+
+    private func observeCircuits() {
+        guard let controller else { return }
+        circuitObserver = controller.addObserver(forCircuitEstablished: { established in
+            guard established else { return }
+            self.queue.async {
+                guard self.status == .starting || self.status == .startingWebTunnel else { return }
+                self.directTimeout?.cancel()
+                self.webTunnelTimeout?.cancel()
+                self.applyWebKitProxy()
+            }
+        })
+    }
+
+    private func configureDirect() {
+        guard let controller else { return }
+        transportController?.stop(IPtProxyWebtunnel)
+        controller.setConfs([
+            ["key": "UseBridges", "value": "0"]
+        ]) { _, _ in }
+        status = .starting
+        transport = "direct"
+        publish()
+        directTimeout?.cancel()
+        let timeout = DispatchWorkItem { [weak self] in
+            guard let self, self.status == .starting else { return }
+            self.startWebTunnelFallback()
+        }
+        directTimeout = timeout
+        queue.asyncAfter(deadline: .now() + 20, execute: timeout)
+    }
+
+    private func applyWebKitProxy() {
+        DispatchQueue.main.async {
+            self.queue.async {
+                self.proxyReady = true
+                self.status = .on
+                self.publish()
+            }
+        }
+    }
+
+    private func startWebTunnelFallback() {
+        status = .fetchingWebTunnel
+        transport = "webtunnel"
+        proxyReady = false
+        publish()
+        fetchLatestWebTunnel { result in
+            self.queue.async {
+                switch result {
+                case .success(let bridge): self.configureWebTunnel(bridge: bridge)
+                case .failure(let error):
+                    if let cached = self.validBridge(UserDefaults.standard.string(forKey: "tor.webtunnel.bridge")) {
+                        self.configureWebTunnel(bridge: cached)
+                    } else { self.failWebTunnel(error) }
+                }
+            }
+        }
+    }
+
+    private func fetchLatestWebTunnel(completion: @escaping (Result<String, Error>) -> Void) {
+        var request = URLRequest(url: URL(string: "https://bridges.torproject.org/moat/circumvention/settings")!)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 15
+        request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = Data(#"{"country":"cn","transports":["webtunnel"]}"#.utf8)
+        let config = URLSessionConfiguration.ephemeral
+        config.waitsForConnectivity = false
+        URLSession(configuration: config).dataTask(with: request) { data, response, error in
+            if let error { completion(.failure(error)); return }
+            guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode), let data else {
+                completion(.failure(NSError(domain: "TorPlugin", code: 4))); return
+            }
+            do {
+                let root = try JSONSerialization.jsonObject(with: data) as? [String: Any]
+                let settings = root?["settings"] as? [[String: Any]] ?? []
+                for item in settings {
+                    guard let bridges = item["bridges"] as? [String: Any],
+                          bridges["type"] as? String == "webtunnel",
+                          let values = bridges["bridge_strings"] as? [String] else { continue }
+                    for value in values {
+                        if let bridge = self.validBridge(value) {
+                            UserDefaults.standard.set(bridge, forKey: "tor.webtunnel.bridge")
+                            completion(.success(bridge)); return
+                        }
+                    }
+                }
+                throw NSError(domain: "TorPlugin", code: 5,
+                              userInfo: [NSLocalizedDescriptionKey: "No WebTunnel bridge returned"])
+            } catch { completion(.failure(error)) }
+        }.resume()
+    }
+
+    private func validBridge(_ input: String?) -> String? {
+        guard let value = input?.trimmingCharacters(in: .whitespacesAndNewlines),
+              value.hasPrefix("webtunnel "), !value.contains("\n"), !value.contains("\r"),
+              value.contains(" url=https://"),
+              value.range(of: #"\sver=[0-9.]+(?:\s.*)?$"#, options: .regularExpression) != nil else { return nil }
+        return value
+    }
+
+    private func configureWebTunnel(bridge: String) {
+        do {
+            let directory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("webtunnel-pt", isDirectory: true)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            if transportController == nil {
+                transportController = IPtProxyController(directory.path, enableLogging: true,
+                                                         unsafeLogging: false, logLevel: "INFO", transportEvents: nil)
+            }
+            try transportController?.start(IPtProxyWebtunnel, proxy: nil)
+            let port = transportController?.port(IPtProxyWebtunnel) ?? 0
+            guard (1...65535).contains(port), let controller else { throw NSError(domain: "TorPlugin", code: 7) }
+            let quote: (String) -> String = { "\"" + $0.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "\"", with: "\\\"") + "\"" }
+            controller.setConfs([
+                ["key": "UseBridges", "value": "1"],
+                ["key": "ClientTransportPlugin", "value": quote("webtunnel socks5 127.0.0.1:\(port)")],
+                ["key": "Bridge", "value": quote(bridge)]
+            ]) { success, error in
+                self.queue.async {
+                    guard success else { self.failWebTunnel(error ?? NSError(domain: "TorPlugin", code: 8)); return }
+                    self.status = .startingWebTunnel
+                    self.publish()
+                    let timeout = DispatchWorkItem { [weak self] in
+                        guard let self, self.status == .startingWebTunnel else { return }
+                        self.failWebTunnel(NSError(domain: "TorPlugin", code: 9,
+                                                   userInfo: [NSLocalizedDescriptionKey: "WebTunnel connection timed out"]))
+                    }
+                    self.webTunnelTimeout = timeout
+                    self.queue.asyncAfter(deadline: .now() + 45, execute: timeout)
+                }
+            }
+        } catch { failWebTunnel(error) }
+    }
+
+    private func failWebTunnel(_ error: Error) {
+        NSLog("[TorPlugin] %@", error.localizedDescription)
+        status = .webTunnelError
+        proxyReady = false
+        publish()
     }
 }
 
@@ -22,7 +283,7 @@ public class SharedFilePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "clearPending", returnType: CAPPluginReturnPromise)
     ]
 
-    private let appGroup = "group.com.fm619tech.paperphoneplus"
+    private let appGroup = "group.com.fm619tech.paperphonelite"
     private let metadataKey = "pendingSharedFile"
 
     @objc func getPending(_ call: CAPPluginCall) {
@@ -78,7 +339,7 @@ public class SecureStoragePlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "deleteSecret", returnType: CAPPluginReturnPromise)
     ]
 
-    private let service = "com.fm619tech.paperphoneplus.secure-storage.v1"
+    private let service = "com.fm619tech.paperphonelite.secure-storage.v1"
 
     private func keyName(_ account: String) -> String { "master.\(account)" }
 
@@ -229,34 +490,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Set notification center delegate so foreground notifications show system banners
         UNUserNotificationCenter.current().delegate = self
         return true
-    }
-
-    // ── APNs: Device token registration (forward to Capacitor) ──
-
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        NotificationCenter.default.post(
-            name: .capacitorDidRegisterForRemoteNotifications,
-            object: deviceToken
-        )
-    }
-
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        NotificationCenter.default.post(
-            name: .capacitorDidFailToRegisterForRemoteNotifications,
-            object: error
-        )
-    }
-
-    // ── APNs: Handle background/silent push notifications ──
-
-    func application(_ application: UIApplication,
-                     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
-                     fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        NotificationCenter.default.post(
-            name: NSNotification.Name.init("didReceiveRemoteNotification"),
-            object: userInfo
-        )
-        completionHandler(.newData)
     }
 
     // ── UNUserNotificationCenterDelegate: Show banner even when app is in foreground ──

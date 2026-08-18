@@ -45,7 +45,7 @@ All notable changes and new features are recorded here. Historical entries below
 
 ## 2.4.0 更新说明
 
-- 新增 iOS 系统分享扩展，可从“文件”、照片及其他应用将文件发送给 PaperPhonePlus 联系人。
+- 新增 iOS 系统分享扩展，可从“文件”、照片及其他应用将文件发送给 PaperPhoneLite 联系人。
 
 ## 2.3.9 更新说明
 
@@ -90,7 +90,7 @@ All notable changes and new features are recorded here. Historical entries below
 
 ## What's New in 2.4.0
 
-- Added an iOS Share Extension for sending files from Files, Photos, and other apps to PaperPhonePlus contacts.
+- Added an iOS Share Extension for sending files from Files, Photos, and other apps to PaperPhoneLite contacts.
 
 ## What's New in 2.3.9
 

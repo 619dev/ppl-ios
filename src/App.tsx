@@ -20,8 +20,6 @@ import NotificationToast from './components/NotificationToast'
 import { get, post } from './api/http'
 import { getPlatform, isNativePlatform } from './utils/platform'
 import { useAutoDeleteCleanup } from './hooks/useAutoDeleteCleanup'
-import { startEmbeddedTor } from './api/tor'
-import { initNativePush } from './api/nativePush'
 import { initLocalNotifications } from './api/localNotification'
 import { setAppBadgeCount } from './api/appBadge'
 
@@ -34,7 +32,6 @@ function ProtectedLayout() {
 
   useEffect(() => {
     if (getPlatform() !== 'ios') return
-    initNativePush().catch(error => console.warn('[NativePush] Init failed:', error))
     initLocalNotifications().catch(error => console.warn('[LocalNotification] Init failed:', error))
   }, [])
 
@@ -104,10 +101,6 @@ export default function App() {
   const user = useStore(s => s.user)
   const theme = useStore(s => s.theme)
   const [hydratedAccount, setHydratedAccount] = useState<string | null>(null)
-
-  useEffect(() => {
-    startEmbeddedTor().catch(error => console.error('[Tor] Failed to start embedded client:', error))
-  }, [])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)

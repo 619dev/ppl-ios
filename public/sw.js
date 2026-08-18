@@ -1,4 +1,4 @@
-/* PaperPhoneLite Service Worker — push notifications + offline shell */
+/* PaperPhoneLite Service Worker — offline shell and media cache */
 const CACHE_NAME = 'paperphonelite-shell-v2'
 const MEDIA_CACHE_NAME = 'paperphone-media-v2'
 const STICKER_CACHE_NAME = 'paperphone-stickers-v1'
@@ -14,47 +14,6 @@ self.addEventListener('activate', (event) => {
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => ![CACHE_NAME, MEDIA_CACHE_NAME, STICKER_CACHE_NAME].includes(k)).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
-  )
-})
-
-// Push notification handler
-self.addEventListener('push', (event) => {
-  let data = { title: 'PaperPhoneLite', body: 'New message' }
-  try {
-    if (event.data) data = event.data.json()
-  } catch {}
-
-  const options = {
-    body: data.body || 'New message',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
-    vibrate: [100, 50, 100],
-    data: data.data || {},
-    actions: [],
-    tag: data.tag || 'paperphonelite-msg',
-    renotify: true,
-  }
-
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      // If app is in foreground, suppress push notification (WebSocket handles it)
-      const anyVisible = clients.some(c => c.visibilityState === 'visible')
-      if (anyVisible) return
-      return self.registration.showNotification(data.title || 'PaperPhoneLite', options)
-    })
-  )
-})
-
-// Click on notification → focus or open app
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clients => {
-      const focused = clients.find(c => c.focused || c.visibilityState === 'visible')
-      if (focused) return focused.focus()
-      if (clients.length > 0) return clients[0].focus()
-      return self.clients.openWindow('/')
-    })
   )
 })
 

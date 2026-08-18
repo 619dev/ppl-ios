@@ -2,7 +2,7 @@ import UIKit
 import UniformTypeIdentifiers
 
 final class ShareViewController: UIViewController {
-    private let appGroup = "group.com.fm619tech.paperphoneplus"
+    private let appGroup = "group.com.fm619tech.paperphonelite"
     private let metadataKey = "pendingSharedFile"
     private var started = false
 
@@ -13,7 +13,7 @@ final class ShareViewController: UIViewController {
         spinner.startAnimating()
         spinner.translatesAutoresizingMaskIntoConstraints = false
         let label = UILabel()
-        label.text = "正在打开 PaperPhonePlus…"
+        label.text = "正在打开 PaperPhoneLite…"
         label.textColor = .secondaryLabel
         label.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(spinner)
@@ -94,7 +94,7 @@ final class ShareViewController: UIViewController {
         DispatchQueue.main.async {
             let alert = UIAlertController(
                 title: "文件已准备好",
-                message: "请打开 PaperPhonePlus，选择联系人后即可发送。",
+                message: "请打开 PaperPhoneLite，选择联系人后即可发送。",
                 preferredStyle: .alert
             )
             alert.addAction(UIAlertAction(title: "好", style: .default) { _ in
@@ -106,7 +106,7 @@ final class ShareViewController: UIViewController {
 
     private func finishWithError(_ message: String) {
         DispatchQueue.main.async {
-            let alert = UIAlertController(title: "PaperPhonePlus", message: message, preferredStyle: .alert)
+            let alert = UIAlertController(title: "PaperPhoneLite", message: message, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "关闭", style: .default) { _ in
                 self.extensionContext?.cancelRequest(withError: CocoaError(.fileReadUnknown))
             })

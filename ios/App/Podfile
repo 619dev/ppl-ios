@@ -1,0 +1,8 @@
+platform :ios, '17.0'
+use_frameworks!
+
+target 'App' do
+  project 'App.xcodeproj'
+  pod 'Tor', '~> 409'
+  pod 'IPtProxy', '~> 5.5'
+end

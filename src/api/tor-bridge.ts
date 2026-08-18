@@ -18,19 +18,19 @@ interface TorPluginInterface {
 
 const TorPlugin = registerPlugin<TorPluginInterface>('TorPlugin')
 
-export const isNativeAndroid = Capacitor.getPlatform() === 'android'
+export const isNativeTorPlatform = ['android', 'ios'].includes(Capacitor.getPlatform())
 
 export async function getTorStatus(): Promise<TorState> {
-  if (!isNativeAndroid) return { status: 'ON', host: '', port: 0, ready: true, transport: 'direct' }
+  if (!isNativeTorPlatform) return { status: 'ON', host: '', port: 0, ready: true, transport: 'direct' }
   return TorPlugin.getStatus()
 }
 
 export async function startTor(): Promise<TorState> {
-  if (!isNativeAndroid) return { status: 'ON', host: '', port: 0, ready: true, transport: 'direct' }
+  if (!isNativeTorPlatform) return { status: 'ON', host: '', port: 0, ready: true, transport: 'direct' }
   return TorPlugin.start()
 }
 
 export async function onTorStatusChange(listener: (state: TorState) => void): Promise<PluginListenerHandle | null> {
-  if (!isNativeAndroid) return null
+  if (!isNativeTorPlatform) return null
   return TorPlugin.addListener('statusChange', listener)
 }

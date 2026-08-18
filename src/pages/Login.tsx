@@ -8,7 +8,7 @@ import { allLangs, langNames, LangCode } from '../i18n'
 import { generateKeyPair, generateSignKeyPair, signMessage, initSodium } from '../crypto/ratchet'
 import { setKeys, getKeys, loadFromIndexedDB } from '../crypto/keystore'
 import { clearAllSenderKeys } from '../crypto/groupCrypto'
-import { getTorStatus, isNativeAndroid, onTorStatusChange, startTor, type TorState } from '../api/tor-bridge'
+import { getTorStatus, isNativeTorPlatform, onTorStatusChange, startTor, type TorState } from '../api/tor-bridge'
 
 export default function Login() {
   const { t } = useI18n()
@@ -30,13 +30,15 @@ export default function Login() {
   const [torStarting, setTorStarting] = useState(false)
 
   useEffect(() => {
-    if (!isNativeAndroid) return
+    if (!isNativeTorPlatform) return
     let disposed = false
     let listener: Awaited<ReturnType<typeof onTorStatusChange>> = null
 
     getTorStatus().then(state => {
-      if (!disposed) setTorState(state)
-    }).catch(() => {})
+      if (disposed) return
+      setTorState(state)
+      if (!state.ready) void handleStartTor()
+    }).catch(() => void handleStartTor())
     onTorStatusChange(state => {
       if (disposed) return
       setTorState(state)
@@ -215,7 +217,7 @@ export default function Login() {
     setLoading(true)
 
     try {
-      if (isNativeAndroid && !torState.ready) {
+      if (isNativeTorPlatform && !torState.ready) {
         setError(t('tor.required_before_auth'))
         setLoading(false)
         return
@@ -356,7 +358,7 @@ export default function Login() {
             </div>
           </div>
 
-          {isNativeAndroid ? (
+          {isNativeTorPlatform ? (
             <div style={{
               display: 'flex', flexDirection: 'column', gap: 10,
               padding: '12px', borderRadius: 12,
@@ -681,7 +683,7 @@ export default function Login() {
 
           {error && <div style={{ color: 'var(--danger)', fontSize: 13, textAlign: 'center' }}>{error}</div>}
 
-          <button className="btn btn-primary btn-full" type="submit" id="submit-btn" disabled={loading || (isNativeAndroid && !torState.ready)}>
+          <button className="btn btn-primary btn-full" type="submit" id="submit-btn" disabled={loading || (isNativeTorPlatform && !torState.ready)}>
             {loading
               ? (isRegister ? t('auth.registering') : t('auth.logging_in'))
               : (isRegister ? t('auth.register') : t('auth.login'))

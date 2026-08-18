@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>PaperPhonePlus</string>
+	<string>PaperPhoneLite</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -24,7 +24,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.fm619tech.paperphoneplus</string>
+			<string>com.fm619tech.paperphonelite</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>paperphone</string>
@@ -38,13 +38,13 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>PaperPhonePlus needs camera access for video calls and QR code scanning.</string>
+	<string>PaperPhoneLite needs camera access for QR code scanning and sending photos.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>PaperPhonePlus needs microphone access for voice and video calls.</string>
+	<string>PaperPhoneLite needs microphone access to record voice messages.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>PaperPhonePlus needs to save images to your photo library.</string>
+	<string>PaperPhoneLite needs permission to save images to your photo library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>PaperPhonePlus needs photo library access to send images in chat.</string>
+	<string>PaperPhoneLite needs photo library access to send images in chat.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
