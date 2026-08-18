@@ -1,0 +1,16 @@
+node_modules/
+dist/
+build/
+release/
+.idea/
+*.tsbuildinfo
+.env
+.env.local
+*.local
+
+# Signing keys — never commit!
+*.keystore
+*.jks
+*.p8
+*.mobileprovision
+.DS_Store
