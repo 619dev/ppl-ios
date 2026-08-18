@@ -4,7 +4,7 @@ The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.8 (46)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.8 (47)`; bundle ID: `com.fm619tech.paperphonelite`.
 
 ## Privacy and network model
 

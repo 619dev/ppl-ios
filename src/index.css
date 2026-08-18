@@ -180,6 +180,276 @@ body.barcode-scanner-active #discover-page > :not(.native-qr-scanner) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   iPad Responsive Layout
+   Full-size iPads and half-screen Split View must use the available
+   scene width instead of inheriting the 480pt phone canvas.
+   ═══════════════════════════════════════════════════════════════ */
+@media screen and (min-width: 500px) {
+  :root {
+    --header-h: 64px;
+    --tabbar-h: 64px;
+  }
+
+  #root {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .page-header {
+    padding-left: max(28px, var(--safe-left));
+    padding-right: max(28px, var(--safe-right));
+  }
+
+  .page-header h1 {
+    font-size: 20px;
+  }
+
+  .page-body {
+    width: 100%;
+  }
+
+  .list-item {
+    gap: 16px;
+    padding: 16px 24px;
+    margin: 2px 16px;
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 21px;
+  }
+
+  .list-content .name {
+    font-size: 17px;
+  }
+
+  .list-content .preview {
+    font-size: 14px;
+  }
+
+  .search-bar {
+    padding: 12px 24px;
+  }
+
+  .tabbar {
+    width: min(720px, calc(100% - 48px - var(--safe-left) - var(--safe-right)));
+    min-height: 64px;
+    margin: 0 auto calc(12px + var(--safe-bottom));
+  }
+
+  .tabbar-item {
+    gap: 3px;
+    font-size: 12px;
+  }
+
+  .tabbar-item.active::before {
+    left: 16px;
+    right: 16px;
+  }
+
+  .chat-messages {
+    padding: 16px clamp(24px, 5vw, 72px);
+    gap: 6px;
+  }
+
+  .msg-row {
+    max-width: 68%;
+  }
+
+  .msg-bubble {
+    font-size: 16px;
+    padding: 11px 16px;
+  }
+
+  .chat-input-bar {
+    padding: 12px max(24px, var(--safe-right));
+    padding-left: max(24px, var(--safe-left));
+    padding-bottom: calc(12px + var(--safe-bottom));
+  }
+
+  .modal {
+    max-width: 560px;
+  }
+
+  .login-page {
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    padding-left: max(40px, var(--safe-left));
+    padding-right: max(40px, var(--safe-right));
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .login-page::before {
+    width: 520px;
+    height: 520px;
+  }
+
+  .login-page::after {
+    width: 440px;
+    height: 440px;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 760px;
+    min-height: calc(100% - 48px - var(--safe-top) - var(--safe-bottom));
+    margin: auto;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-brand,
+  .login-panel {
+    width: 100%;
+  }
+
+  .login-panel {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .login-logo-img {
+    width: 96px;
+    height: 96px;
+  }
+
+  .login-title {
+    font-size: 34px;
+  }
+
+  .login-subtitle {
+    font-size: 16px;
+    margin-bottom: 22px;
+  }
+
+  .login-form {
+    gap: 18px;
+  }
+
+  .input {
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .btn {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .login-toggle {
+    font-size: 16px;
+    margin-top: 20px;
+  }
+
+  .login-lang button {
+    min-height: 38px;
+    padding: 7px 16px;
+    font-size: 14px;
+  }
+
+  .login-privacy-link {
+    font-size: 14px;
+  }
+}
+
+/* Full-width iPads: keep large text surfaces readable without restoring
+   the phone-sized application shell. */
+@media screen and (min-width: 900px) {
+  .login-card {
+    width: calc(100% - 96px - var(--safe-left) - var(--safe-right));
+    max-width: 1180px;
+    min-height: calc(100% - 96px - var(--safe-top) - var(--safe-bottom));
+    padding: clamp(48px, 6vw, 88px);
+    display: grid;
+    grid-template-columns: minmax(280px, 0.82fr) minmax(440px, 1.18fr);
+    align-items: center;
+    gap: clamp(56px, 7vw, 112px);
+  }
+
+  .login-brand {
+    display: flex;
+    min-height: 420px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(145deg, rgba(255,255,255,0.34), rgba(0,166,178,0.08));
+    border: 0.5px solid var(--glass-border);
+  }
+
+  [data-theme="dark"] .login-brand {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,166,178,0.10));
+  }
+
+  .login-brand .login-logo-img {
+    width: clamp(112px, 11vw, 156px);
+    height: clamp(112px, 11vw, 156px);
+  }
+
+  .login-brand .login-title {
+    margin-top: 24px;
+    font-size: clamp(34px, 3.6vw, 48px);
+  }
+
+  .login-brand .login-subtitle {
+    max-width: 300px;
+    margin-top: 10px;
+    margin-bottom: 0;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .login-panel {
+    max-width: 600px;
+  }
+
+  .privacy-policy-body,
+  .settings-list,
+  .moment-feed {
+    width: min(100%, 980px);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .chat-attachment-grid {
+    grid-template-columns: repeat(4, minmax(88px, 1fr));
+  }
+}
+
+/* iPad landscape and Stage Manager windows with limited height. */
+@media screen and (min-width: 700px) and (orientation: landscape) and (max-height: 850px) {
+  .login-page {
+    justify-content: flex-start;
+    padding-top: calc(28px + var(--safe-top));
+    padding-bottom: calc(28px + var(--safe-bottom));
+  }
+
+  .login-card {
+    min-height: auto;
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .login-logo-img {
+    width: 72px;
+    height: 72px;
+  }
+
+  .login-title {
+    font-size: 30px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    Scrollbar (subtle, iOS-like)
    ═══════════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 3px; }
@@ -1996,4 +2266,188 @@ textarea.input {
 
 .privacy-footer p {
   margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Final iPad overrides
+   Kept after every component rule so phone defaults cannot narrow the
+   scene or authentication surface back to 480/380pt.
+   ═══════════════════════════════════════════════════════════════ */
+@media screen and (min-width: 500px) {
+  #root {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .page-header {
+    min-height: calc(64px + var(--safe-top));
+    height: calc(64px + var(--safe-top));
+    padding-left: max(28px, var(--safe-left));
+    padding-right: max(28px, var(--safe-right));
+  }
+
+  .page-header h1 { font-size: 20px; }
+  .page-body { width: 100%; }
+
+  .list-item {
+    gap: 16px;
+    padding: 16px 24px;
+    margin: 2px 16px;
+  }
+
+  .list-item .avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 21px;
+  }
+
+  .list-content .name { font-size: 17px; }
+  .list-content .preview { font-size: 14px; }
+  .search-bar { padding: 12px 24px; }
+
+  .tabbar {
+    width: min(720px, calc(100% - 48px - var(--safe-left) - var(--safe-right)));
+    height: 64px;
+    min-height: 64px;
+    margin: 0 auto calc(12px + var(--safe-bottom));
+  }
+
+  .tabbar-item { gap: 3px; font-size: 12px; }
+  .tabbar-item.active::before { left: 16px; right: 16px; }
+
+  .chat-messages {
+    padding: 16px clamp(24px, 5vw, 72px);
+    gap: 6px;
+  }
+
+  .msg-row { max-width: 68%; }
+  .msg-bubble { padding: 11px 16px; font-size: 16px; }
+
+  .chat-input-bar {
+    padding-top: 12px;
+    padding-right: max(24px, var(--safe-right));
+    padding-bottom: calc(12px + var(--safe-bottom));
+    padding-left: max(24px, var(--safe-left));
+  }
+
+  .modal { max-width: 560px; }
+
+  .login-page {
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
+    padding: calc(24px + var(--safe-top)) max(24px, var(--safe-right))
+             calc(24px + var(--safe-bottom)) max(24px, var(--safe-left));
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 760px;
+    min-height: calc(100% - var(--safe-top) - var(--safe-bottom));
+    margin: auto;
+    padding: 48px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .login-brand,
+  .login-panel {
+    width: 100%;
+  }
+
+  .login-panel {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .login-logo-img { width: 96px; height: 96px; }
+  .login-title { font-size: 34px; }
+  .login-subtitle { margin-bottom: 22px; font-size: 16px; }
+  .login-form { gap: 18px; }
+  .input { min-height: 50px; font-size: 16px; }
+  .btn { min-height: 48px; font-size: 16px; }
+  .login-toggle { margin-top: 20px; font-size: 16px; }
+  .login-lang button { min-height: 38px; padding: 7px 16px; font-size: 14px; }
+  .login-privacy-link { font-size: 14px; }
+}
+
+@media screen and (min-width: 900px) {
+  .login-page {
+    padding: calc(40px + var(--safe-top)) max(48px, var(--safe-right))
+             calc(40px + var(--safe-bottom)) max(48px, var(--safe-left));
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 1180px;
+    min-height: calc(100% - var(--safe-top) - var(--safe-bottom));
+    padding: clamp(48px, 5vw, 80px);
+    display: grid;
+    grid-template-columns: minmax(280px, 0.82fr) minmax(440px, 1.18fr);
+    align-items: center;
+    gap: clamp(48px, 6vw, 96px);
+  }
+
+  .login-brand {
+    display: flex;
+    min-height: min(680px, 70vh);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    border: 0.5px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(145deg, rgba(255,255,255,0.34), rgba(0,166,178,0.08));
+  }
+
+  [data-theme="dark"] .login-brand {
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,166,178,0.10));
+  }
+
+  .login-brand .login-logo-img {
+    width: clamp(112px, 11vw, 156px);
+    height: clamp(112px, 11vw, 156px);
+  }
+
+  .login-brand .login-title {
+    margin-top: 24px;
+    font-size: clamp(34px, 3.6vw, 48px);
+  }
+
+  .login-brand .login-subtitle {
+    max-width: 300px;
+    margin: 10px 0 0;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  .privacy-policy-body,
+  .settings-list,
+  .moment-feed {
+    width: min(100%, 980px);
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+@media screen and (min-width: 700px) and (orientation: landscape) and (max-height: 850px) {
+  .login-page {
+    justify-content: flex-start;
+    padding-top: calc(24px + var(--safe-top));
+    padding-bottom: calc(24px + var(--safe-bottom));
+  }
+
+  .login-card {
+    min-height: auto;
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .login-brand { min-height: 520px; }
 }

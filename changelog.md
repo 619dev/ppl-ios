@@ -4,6 +4,18 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.8 (iOS build 47) — 2026-08-19
+
+- Added native responsive layouts for every supported iPad size, orientation, Split View width, and Stage Manager window size.
+- Replaced the phone-width authentication surface on full-size iPads with a spacious two-column brand and sign-in layout; compact iPad windows automatically use a full-width single-column layout.
+- Adapted headers, lists, search, chat spacing and bubble widths, input bars, modals, and the floating tab bar for iPad displays.
+
+- 新增适用于全部受支持 iPad 尺寸、横竖屏、分屏宽度和台前调度窗口尺寸的响应式布局。
+- 全尺寸 iPad 登录与注册页改为品牌区和表单区双栏布局；较窄的 iPad 窗口自动切换为满宽单栏布局。
+- 同步适配页面标题、列表、搜索、聊天间距与气泡宽度、输入栏、弹窗和悬浮底部导航。
+
+---
+
 ## 3.0.8 (iOS build 46) — 2026-08-19
 
 - Rebased the iOS client on PaperPhoneLite 3.0.8 and aligned its application identity with `com.fm619tech.paperphonelite`.

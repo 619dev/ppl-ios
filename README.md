@@ -4,7 +4,7 @@ PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Ca
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.8 (46)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.8 (47)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
 ## 隐私与网络模型
 

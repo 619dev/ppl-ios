@@ -338,13 +338,16 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-logo">
-          <img src="/icons/icon-512.png" alt="PaperPhoneLite" className="login-logo-img" />
+        <div className="login-brand">
+          <div className="login-logo">
+            <img src="/icons/icon-512.png" alt="PaperPhoneLite" className="login-logo-img" />
+          </div>
+          <h1 className="login-title">{t('app.name')}</h1>
+          <p className="login-subtitle">{t('auth.subtitle')}</p>
         </div>
-        <h1 className="login-title">{t('app.name')}</h1>
-        <p className="login-subtitle">{t('auth.subtitle')}</p>
 
-        <form className="login-form" onSubmit={handleSubmit}>
+        <div className="login-panel">
+          <form className="login-form" onSubmit={handleSubmit}>
           <div className="input-group">
             <div className="server-url-input">
               <Server size={16} className="server-url-icon" />
@@ -689,51 +692,52 @@ export default function Login() {
               : (isRegister ? t('auth.register') : t('auth.login'))
             }
           </button>
-        </form>
+          </form>
 
-        {/* Terms of Use checkbox (login & registration) */}
-        <div style={{
-          display: 'flex', alignItems: 'flex-start', gap: 8,
-          padding: '8px 4px', fontSize: 13, color: 'var(--text-secondary)',
-        }}>
-          <input
-            type="checkbox"
-            id="terms-checkbox"
-            checked={agreedToTerms}
-            onChange={e => setAgreedToTerms(e.target.checked)}
-            style={{ marginTop: 2, accentColor: 'var(--accent)', width: 18, height: 18, flexShrink: 0 }}
-          />
-          <label htmlFor="terms-checkbox" style={{ lineHeight: 1.4 }}>
-            {t('terms.agree_prefix')}
-            <a onClick={() => navigate('/terms')} style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>
-              {t('terms.agree_link')}
+          {/* Terms of Use checkbox (login & registration) */}
+          <div style={{
+            display: 'flex', alignItems: 'flex-start', gap: 8,
+            padding: '8px 4px', fontSize: 13, color: 'var(--text-secondary)',
+          }}>
+            <input
+              type="checkbox"
+              id="terms-checkbox"
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+              style={{ marginTop: 2, accentColor: 'var(--accent)', width: 18, height: 18, flexShrink: 0 }}
+            />
+            <label htmlFor="terms-checkbox" style={{ lineHeight: 1.4 }}>
+              {t('terms.agree_prefix')}
+              <a onClick={() => navigate('/terms')} style={{ color: 'var(--accent)', cursor: 'pointer', fontWeight: 600 }}>
+                {t('terms.agree_link')}
+              </a>
+            </label>
+          </div>
+
+          <div className="login-toggle">
+            {isRegister ? t('auth.has_account') : t('auth.no_account')}{' '}
+            <a onClick={() => { setIsRegister(!isRegister); setError('') }}>
+              {isRegister ? t('auth.login') : t('auth.register')}
             </a>
-          </label>
-        </div>
+          </div>
 
-        <div className="login-toggle">
-          {isRegister ? t('auth.has_account') : t('auth.no_account')}{' '}
-          <a onClick={() => { setIsRegister(!isRegister); setError('') }}>
-            {isRegister ? t('auth.login') : t('auth.register')}
-          </a>
-        </div>
+          <div className="login-lang">
+            {allLangs.map(l => (
+              <button
+                key={l}
+                className={lang === l ? 'active' : ''}
+                onClick={() => setLang(l)}
+              >
+                {langNames[l]}
+              </button>
+            ))}
+          </div>
 
-        <div className="login-lang">
-          {allLangs.map(l => (
-            <button
-              key={l}
-              className={lang === l ? 'active' : ''}
-              onClick={() => setLang(l)}
-            >
-              {langNames[l]}
-            </button>
-          ))}
-        </div>
-
-        <div className="login-privacy-link" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-          <a onClick={() => navigate('/terms')}>{t('terms.title')}</a>
-          <span style={{ opacity: 0.3 }}>|</span>
-          <a onClick={() => navigate('/privacy')}>{t('privacy.title')}</a>
+          <div className="login-privacy-link" style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <a onClick={() => navigate('/terms')}>{t('terms.title')}</a>
+            <span style={{ opacity: 0.3 }}>|</span>
+            <a onClick={() => navigate('/privacy')}>{t('privacy.title')}</a>
+          </div>
         </div>
       </div>
     </div>
