@@ -120,7 +120,6 @@ export async function encryptHybrid(
   plaintext: string
 ): Promise<{ ciphertext: string; header: string; protocolVersion: 1 | 2; downgraded: boolean }> {
   const sodium = await initSodium()
-  const kyber = recipientKemPub ? await getKyber() : null
 
   // Ephemeral X25519 keypair
   const ephemeral = sodium.crypto_box_keypair()
@@ -133,9 +132,13 @@ export async function encryptHybrid(
   let kemCt: Uint8Array | null = null
   let version: number
 
-  if (kyber && recipientKemPub) {
+  if (recipientKemPub) {
     // Hybrid: ECDH + Kyber KEM
     try {
+      // Keep loading the optional ML-KEM implementation inside the fallback
+      // boundary so a WebView/module failure cannot block valid X25519 sends.
+      const kyber = await getKyber()
+      if (!kyber) throw new Error('ML-KEM is unavailable')
       const kemPub = sodium.from_base64(recipientKemPub)
       const [ct, kemSharedSecret] = await kyber.encap(kemPub)
       kemCt = ct
@@ -150,6 +153,7 @@ export async function encryptHybrid(
       version = 2
     } catch {
       // Kyber failed, fallback to ECDH only
+      kemCt = null
       finalKey = ecdhSecret
       version = 1
     }

@@ -122,6 +122,10 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
                               userInfo: [NSLocalizedDescriptionKey: "Tor control port file is unavailable"])
             }
             try? files.removeItem(at: controlPortFile)
+            // A force-terminated simulator process can leave the previous
+            // control cookie behind. Remove it before Tor starts so we never
+            // authenticate a new control port with stale credentials.
+            try? files.removeItem(at: root.appendingPathComponent("control_auth_cookie"))
             configuration = config
             let thread = TorThread(configuration: config)
             torThread = thread
@@ -155,7 +159,17 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
         if candidate.isConnected {
             candidate.authenticate(with: cookie) { success, error in
                 self.queue.async {
-                    guard success else { self.failWebTunnel(error ?? NSError(domain: "TorPlugin", code: 3)); return }
+                    guard success else {
+                        candidate.disconnect()
+                        // The control-port file can become visible just before
+                        // Tor atomically replaces its authentication cookie.
+                        // Re-read both on the next attempt instead of turning a
+                        // short startup race into a permanent offline state.
+                        self.queue.asyncAfter(deadline: .now() + 0.1) {
+                            self.connectController(controlPortFile: controlPortFile, attempt: attempt + 1)
+                        }
+                        return
+                    }
                     self.controller = candidate
                     self.observeCircuits()
                     self.configureDirect()

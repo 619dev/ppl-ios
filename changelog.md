@@ -9,11 +9,19 @@ All notable changes and new features are recorded here. Historical entries below
 - Fixed native Tor startup for persisted signed-in sessions so cold launches no longer remain stuck in WebSocket reconnection.
 - Native Tor now starts at the application root, and WebSocket recovery is triggered immediately after the WebKit proxy becomes ready.
 - Improved the startup text-appearance password prompt so its visibility stays synchronized with the actual encryption lock state.
+- Prevented access-token refreshes from rehydrating presentation encryption and silently clearing a password that was just unlocked.
+- Restored or reprovisioned missing local identity keys during persisted-session startup, and fetches missing recipient public keys before private-message encryption.
+- Made native Tor control authentication recover from stale simulator cookies and startup cookie-replacement races instead of remaining permanently offline.
+- Fixed private-message encryption after text-appearance unlock by no longer treating the Ed25519 signing key as an ML-KEM public key; optional ML-KEM failures now reliably fall back to X25519.
 - Updated the application and Share Extension versions to 3.0.16 and incremented the iOS build number to 51.
 
 - 修复已有登录会话冷启动时未启动内置 Tor、导致 WebSocket 一直重连的问题。
 - 内置 Tor 现于应用根层启动，并在 WebKit 代理就绪后立即触发 WebSocket 恢复连接。
 - 改进启动时的文本外观密码弹窗，使其显示状态始终与实际加密锁定状态同步。
+- 修复访问令牌刷新时重复加载文本外观加密状态、静默清除刚解锁密码的问题。
+- 已有会话启动时自动恢复或重新生成缺失的本地身份密钥，并在私聊加密前补取缺失的接收方公钥。
+- 修复模拟器残留 Tor 控制认证 cookie 或启动时 cookie 替换竞态导致永久离线的问题，认证失败后会重新读取并重试。
+- 修复文本外观已经解锁后私聊仍可能提示加密失败的问题：不再把 Ed25519 签名公钥误作 ML-KEM 公钥，并确保可选 ML-KEM 异常时可靠回退到 X25519。
 - App 与分享扩展版本统一更新为 3.0.16，iOS 构建号递增至 51。
 
 ---

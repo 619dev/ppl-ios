@@ -827,13 +827,22 @@ export default function Chat() {
         }
       } else {
         const keys = getKeys()
-        const recipientPub = friend?.ik_pub
-        const recipientKem = friend?.kem_pub
+        let recipientPub = friend?.ik_pub
+        // A persisted/deep-linked chat can open before the friends request has
+        // populated public keys. Resolve the current bundle directly instead
+        // of reporting a generic encryption failure for a recoverable cache miss.
+        if (!recipientPub) {
+          const recipient = await get(`/api/users/${id}`)
+          recipientPub = recipient?.ik_pub
+        }
         if (!recipientPub || !keys) {
           throw new Error('Recipient or local encryption keys are unavailable')
         } else {
           try {
-            const forRecipient = await encryptHybrid(recipientPub, recipientKem, wireContent)
+            // The API currently exposes the Ed25519 signing key in kem_pub,
+            // not an ML-KEM key. Use the valid X25519 identity key until a
+            // real ML-KEM key bundle is published by the server.
+            const forRecipient = await encryptHybrid(recipientPub, null, wireContent)
             const forSelf = await encryptHybrid(keys.ik_pub, null, wireContent)
             // Keep the optimistic cache ciphertext-only while waiting for the
             // server acknowledgement, matching the Android 2.3.8 hardening.

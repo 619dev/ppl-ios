@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useEffect, useState } from 'react'
 import { useStore } from './store'
 import { useSocket } from './hooks/useSocket'
-import { loadFromIndexedDB } from './crypto/keystore'
+import { ensureIdentityKeys } from './crypto/identity'
 import { hydrateSenderKeys } from './crypto/groupCrypto'
 import { getPresentationSettings, handlePresentationAppState, hydratePresentationCrypto, isPresentationUnlocked, presentationCiphertextForPlaintext, unlockPresentationCrypto } from './crypto/presentationCrypto'
 import Login from './pages/Login'
@@ -155,7 +155,7 @@ export default function App() {
       setHydratedAccount(null)
       return
     }
-    Promise.all([loadFromIndexedDB(user.id), hydrateSenderKeys(user.id), hydratePresentationCrypto(user.id)])
+    Promise.all([ensureIdentityKeys(user.id), hydrateSenderKeys(user.id), hydratePresentationCrypto(user.id)])
       .then(() => {
         if (cancelled) return
         syncPresentationUnlockPrompt()
@@ -169,7 +169,10 @@ export default function App() {
         }
       })
     return () => { cancelled = true }
-  }, [token, user?.id])
+  // Access tokens rotate independently of the signed-in account. Rehydrating
+  // on every refresh clears the in-memory presentation password immediately
+  // after a successful startup unlock, so key this lifecycle to the account.
+  }, [user?.id])
 
   const unlockPresentationAtStartup = async (event: React.FormEvent) => {
     event.preventDefault()
