@@ -29,7 +29,7 @@ async function fetchAndStoreSenderKeys(groupId: string): Promise<boolean> {
       // Cached keys may be stale after identity key changes (logout/login cycle).
       try {
         const senderKey = await receiveSenderKey(
-          k.encrypted_key, k.header, keys.ik_priv, keys.kem_priv
+          k.encrypted_key, k.header, keys.ik_priv, null
         )
         storeSenderKey(groupId, k.from_id, senderKey, k.key_version || 1)
         imported = true
@@ -125,11 +125,11 @@ export function useSocket() {
             if (keys) {
               const isMe = data.from === myId
               if (isMe && data.self_ciphertext && data.self_header) {
-                const decrypted = await decryptHybrid(data.self_header, keys.ik_priv, keys.kem_priv, data.self_ciphertext)
+                const decrypted = await decryptHybrid(data.self_header, keys.ik_priv, null, data.self_ciphertext)
                 const text = await unprotectPresentationText(decrypted)
                 msgToAdd = { ...data, decrypted: text }
               } else if (!isMe) {
-                const decrypted = await decryptHybrid(data.header, keys.ik_priv, keys.kem_priv, data.ciphertext)
+                const decrypted = await decryptHybrid(data.header, keys.ik_priv, null, data.ciphertext)
                 const text = await unprotectPresentationText(decrypted)
                 msgToAdd = { ...data, decrypted: text }
               }
@@ -319,7 +319,7 @@ export function useSocket() {
               data.encrypted_key,
               data.header,
               keys.ik_priv,
-              keys.kem_priv
+              null
             )
             storeSenderKey(data.group_id, data.from_id, senderKey, data.key_version || 1)
             console.log(`[useSocket] Stored sender key from ${data.from_id} for group ${data.group_id}`)

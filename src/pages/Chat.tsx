@@ -574,7 +574,7 @@ export default function Chat() {
                     k.encrypted_key,
                     k.header,
                     keys.ik_priv,
-                    keys.kem_priv
+                    null
                   )
                   storeSenderKey(id!, k.from_id, senderKey, k.key_version || 1)
                 } catch (err) {
@@ -606,11 +606,11 @@ export default function Chat() {
           try {
             const isMe = msg.from === user?.id
             if (isMe && msg.self_ciphertext && msg.self_header) {
-              const decrypted = await decryptHybrid(msg.self_header, keys?.ik_priv || '', keys?.kem_priv, msg.self_ciphertext)
+              const decrypted = await decryptHybrid(msg.self_header, keys?.ik_priv || '', null, msg.self_ciphertext)
               const text = await unprotectPresentationText(decrypted)
               return { ...msg, decrypted: text }
             } else if (!isMe && msg.ciphertext && msg.header) {
-              const decrypted = await decryptHybrid(msg.header, keys?.ik_priv || '', keys?.kem_priv, msg.ciphertext)
+              const decrypted = await decryptHybrid(msg.header, keys?.ik_priv || '', null, msg.ciphertext)
               const text = await unprotectPresentationText(decrypted)
               return { ...msg, decrypted: text }
             }
@@ -827,22 +827,13 @@ export default function Chat() {
         }
       } else {
         const keys = getKeys()
-        let recipientPub = friend?.ik_pub
-        // A persisted/deep-linked chat can open before the friends request has
-        // populated public keys. Resolve the current bundle directly instead
-        // of reporting a generic encryption failure for a recoverable cache miss.
-        if (!recipientPub) {
-          const recipient = await get(`/api/users/${id}`)
-          recipientPub = recipient?.ik_pub
-        }
+        const recipientPub = friend?.ik_pub
+        const recipientKem = friend?.kem_pub
         if (!recipientPub || !keys) {
           throw new Error('Recipient or local encryption keys are unavailable')
         } else {
           try {
-            // The API currently exposes the Ed25519 signing key in kem_pub,
-            // not an ML-KEM key. Use the valid X25519 identity key until a
-            // real ML-KEM key bundle is published by the server.
-            const forRecipient = await encryptHybrid(recipientPub, null, wireContent)
+            const forRecipient = await encryptHybrid(recipientPub, recipientKem, wireContent)
             const forSelf = await encryptHybrid(keys.ik_pub, null, wireContent)
             // Keep the optimistic cache ciphertext-only while waiting for the
             // server acknowledgement, matching the Android 2.3.8 hardening.

@@ -120,6 +120,7 @@ export async function encryptHybrid(
   plaintext: string
 ): Promise<{ ciphertext: string; header: string; protocolVersion: 1 | 2; downgraded: boolean }> {
   const sodium = await initSodium()
+  const kyber = recipientKemPub ? await getKyber() : null
 
   // Ephemeral X25519 keypair
   const ephemeral = sodium.crypto_box_keypair()
@@ -132,13 +133,9 @@ export async function encryptHybrid(
   let kemCt: Uint8Array | null = null
   let version: number
 
-  if (recipientKemPub) {
+  if (kyber && recipientKemPub) {
     // Hybrid: ECDH + Kyber KEM
     try {
-      // Keep loading the optional ML-KEM implementation inside the fallback
-      // boundary so a WebView/module failure cannot block valid X25519 sends.
-      const kyber = await getKyber()
-      if (!kyber) throw new Error('ML-KEM is unavailable')
       const kemPub = sodium.from_base64(recipientKemPub)
       const [ct, kemSharedSecret] = await kyber.encap(kemPub)
       kemCt = ct
@@ -153,7 +150,6 @@ export async function encryptHybrid(
       version = 2
     } catch {
       // Kyber failed, fallback to ECDH only
-      kemCt = null
       finalKey = ecdhSecret
       version = 1
     }
@@ -201,11 +197,7 @@ export function inspectHybridProtocol(headerB64?: string | null): HybridProtocol
   if (!headerB64) return null
   try {
     const normalized = headerB64.replace(/-/g, '+').replace(/_/g, '/')
-    const decoded = atob(normalized)
-    // Android clients predating the versioned hybrid envelope use a
-    // 32-byte ephemeral key followed by a 24-byte nonce (56 bytes total).
-    if (decoded.length === 56) return { version: 0, name: 'X25519', downgraded: true }
-    const version = decoded[0]?.charCodeAt(0)
+    const version = atob(normalized)[0]?.charCodeAt(0)
     if (!version) return null
     if (version >= 2) return { version, name: 'X25519 + ML-KEM-768', downgraded: false }
     return { version, name: 'X25519', downgraded: true }
@@ -225,16 +217,6 @@ export async function decryptHybrid(
 ): Promise<string> {
   const sodium = await initSodium()
   const headerBytes = sodium.from_base64(headerB64)
-
-  // Backward compatibility with Android's original crypto_box envelope.
-  // Its header has no leading protocol byte: [32-byte ephemeral pub][24-byte
-  // nonce]. Treating its first random public-key byte as a version shifts the
-  // key and nonce offsets and makes every cross-platform message undecryptable.
-  if (headerBytes.length === sodium.crypto_box_PUBLICKEYBYTES + sodium.crypto_box_NONCEBYTES) {
-    const plaintext = await decrypt(headerB64, recipientPrivKey, ciphertextB64)
-    return unprotectPresentationText(plaintext)
-  }
-
   const ct = sodium.from_base64(ciphertextB64)
   const privKey = sodium.from_base64(recipientPrivKey)
 
