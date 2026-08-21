@@ -13,6 +13,8 @@ export interface KeyBundle {
   spk_sig: string
   sign_pub: string
   sign_priv: string
+  kem_pub?: string
+  kem_priv?: string
   opks: Array<{ key_id: number; pub: string; priv: string }>
 }
 

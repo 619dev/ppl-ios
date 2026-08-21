@@ -1,13 +1,15 @@
 import { get, post, put } from '../api/http'
 import { clearAllSenderKeys } from './groupCrypto'
 import { getKeys, loadFromIndexedDB, setKeys, type KeyBundle } from './keystore'
-import { generateKeyPair, generateSignKeyPair, initSodium, signMessage } from './ratchet'
+import { generateKemKeyPair, generateKeyPair, generateSignKeyPair, initSodium, signMessage } from './ratchet'
 
 async function generateIdentityKeys(): Promise<KeyBundle> {
   const sodium = await initSodium()
   const ikPair = await generateKeyPair()
   const spkPair = await generateKeyPair()
   const signPair = await generateSignKeyPair()
+  const kemPair = await generateKemKeyPair()
+  if (!kemPair) throw new Error('ML-KEM key generation is unavailable')
   const spkSig = await signMessage(sodium.from_base64(spkPair.publicKey), signPair.privateKey)
   const opks: KeyBundle['opks'] = []
   for (let keyId = 0; keyId < 20; keyId++) {
@@ -19,6 +21,7 @@ async function generateIdentityKeys(): Promise<KeyBundle> {
     spk_pub: spkPair.publicKey, spk_priv: spkPair.privateKey,
     spk_sig: spkSig,
     sign_pub: signPair.publicKey, sign_priv: signPair.privateKey,
+    kem_pub: kemPair.kemPub, kem_priv: kemPair.kemPriv,
     opks,
   }
 }
@@ -31,7 +34,7 @@ async function publishIdentityKeys(keys: KeyBundle): Promise<void> {
     ik_pub: keys.ik_pub,
     spk_pub: keys.spk_pub,
     spk_sig: keys.spk_sig,
-    kem_pub: keys.sign_pub,
+    kem_pub: keys.kem_pub || keys.sign_pub,
     prekeys: keys.opks.map(key => ({ key_id: key.key_id, opk_pub: key.pub })),
   })
   await post('/api/users/reset-sender-keys', {})
@@ -50,7 +53,7 @@ export async function syncIdentityKeysWithServer(accountId: string): Promise<boo
     const keys = getKeys() || await loadFromIndexedDB(accountId)
     if (!keys) return false
     const me = await get('/api/users/me')
-    if (me?.ik_pub === keys.ik_pub) return false
+    if (me?.ik_pub === keys.ik_pub && me?.kem_pub === keys.kem_pub) return false
     await publishIdentityKeys(keys)
     console.log('[Identity] Server public identity reconciled with local private key')
     return true
@@ -78,7 +81,13 @@ export async function ensureIdentityKeys(accountId: string): Promise<KeyBundle> 
 }
 
 async function ensureIdentityKeysOnce(accountId: string): Promise<KeyBundle> {
-  const existing = getKeys() || await loadFromIndexedDB(accountId)
+  let existing = getKeys() || await loadFromIndexedDB(accountId)
+  if (existing && (!existing.kem_pub || !existing.kem_priv)) {
+    const kemPair = await generateKemKeyPair()
+    if (!kemPair) throw new Error('ML-KEM key migration is unavailable')
+    existing = { ...existing, kem_pub: kemPair.kemPub, kem_priv: kemPair.kemPriv }
+    await setKeys(existing, accountId)
+  }
   if (existing) return existing
 
   const keys = await generateIdentityKeys()

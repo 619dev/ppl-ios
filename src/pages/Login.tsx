@@ -5,7 +5,7 @@ import { useStore } from '../store'
 import { useI18n } from '../hooks/useI18n'
 import { ShieldCheck, Shield, Server, Wifi, ChevronDown, ChevronUp, Check } from 'lucide-react'
 import { allLangs, langNames, LangCode } from '../i18n'
-import { generateKeyPair, generateSignKeyPair, signMessage, initSodium } from '../crypto/ratchet'
+import { generateKemKeyPair, generateKeyPair, generateSignKeyPair, signMessage, initSodium } from '../crypto/ratchet'
 import { setKeys, getKeys, loadFromIndexedDB } from '../crypto/keystore'
 import { clearAllSenderKeys } from '../crypto/groupCrypto'
 import { getTorStatus, isNativeTorPlatform, onTorStatusChange, startTor, type TorState } from '../api/tor-bridge'
@@ -141,6 +141,8 @@ export default function Login() {
       const ikPair = await generateKeyPair()
       const spkPair = await generateKeyPair()
       const signPair = await generateSignKeyPair()
+      const kemPair = await generateKemKeyPair()
+      if (!kemPair) throw new Error('ML-KEM key generation is unavailable')
       const spkPubBytes = sodium.from_base64(spkPair.publicKey)
       const spkSig = await signMessage(spkPubBytes, signPair.privateKey)
       const opks: Array<{ key_id: number; pub: string; priv: string }> = []
@@ -153,6 +155,7 @@ export default function Login() {
         spk_pub: spkPair.publicKey, spk_priv: spkPair.privateKey,
         spk_sig: spkSig,
         sign_pub: signPair.publicKey, sign_priv: signPair.privateKey,
+        kem_pub: kemPair.kemPub, kem_priv: kemPair.kemPriv,
         opks,
       })
       // Upload public keys to server
@@ -160,7 +163,7 @@ export default function Login() {
         ik_pub: ikPair.publicKey,
         spk_pub: spkPair.publicKey,
         spk_sig: spkSig,
-        kem_pub: signPair.publicKey,
+        kem_pub: kemPair.kemPub,
         prekeys: opks.map(k => ({ key_id: k.key_id, opk_pub: k.pub })),
       })
       // Reset all sender key distributions on the server and notify group members.
@@ -196,7 +199,7 @@ export default function Login() {
         ik_pub: keys.ik_pub,
         spk_pub: keys.spk_pub,
         spk_sig: keys.spk_sig,
-        kem_pub: keys.sign_pub,
+        kem_pub: keys.kem_pub || keys.sign_pub,
         prekeys: keys.opks?.map(k => ({ key_id: k.key_id, opk_pub: k.pub })),
       })
       await post('/api/users/reset-sender-keys', {})
@@ -234,6 +237,8 @@ export default function Login() {
         const ikPair = await generateKeyPair()
         const spkPair = await generateKeyPair()
         const signPair = await generateSignKeyPair()
+        const kemPair = await generateKemKeyPair()
+        if (!kemPair) throw new Error('ML-KEM key generation is unavailable')
 
         // Sign the SPK with the signing key
         const spkPubBytes = sodium.from_base64(spkPair.publicKey)
@@ -253,7 +258,7 @@ export default function Login() {
           ik_pub: ikPair.publicKey,
           spk_pub: spkPair.publicKey,
           spk_sig: spkSig,
-          kem_pub: signPair.publicKey,
+          kem_pub: kemPair.kemPub,
           prekeys: opks.map(k => ({ key_id: k.key_id, opk_pub: k.pub })),
         })
 
@@ -266,6 +271,8 @@ export default function Login() {
           spk_sig: spkSig,
           sign_pub: signPair.publicKey,
           sign_priv: signPair.privateKey,
+          kem_pub: kemPair.kemPub,
+          kem_priv: kemPair.kemPriv,
           opks,
         }, res.user.id)
 
