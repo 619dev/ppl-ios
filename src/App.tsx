@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import { useEffect, useState } from 'react'
 import { useStore } from './store'
 import { useSocket } from './hooks/useSocket'
-import { ensureIdentityKeys } from './crypto/identity'
+import { ensureIdentityKeys, syncIdentityKeysWithServer } from './crypto/identity'
 import { hydrateSenderKeys } from './crypto/groupCrypto'
 import { getPresentationSettings, handlePresentationAppState, hydratePresentationCrypto, isPresentationUnlocked, presentationCiphertextForPlaintext, unlockPresentationCrypto } from './crypto/presentationCrypto'
 import Login from './pages/Login'
@@ -173,6 +173,25 @@ export default function App() {
   // on every refresh clears the in-memory presentation password immediately
   // after a successful startup unlock, so key this lifecycle to the account.
   }, [user?.id])
+
+  useEffect(() => {
+    if (!token || !user?.id || hydratedAccount !== user.id) return
+    let cancelled = false
+    const reconcile = () => {
+      if (cancelled) return
+      syncIdentityKeysWithServer(user.id).catch(error => {
+        console.warn('[Identity] Server reconciliation deferred until network recovery:', error)
+      })
+    }
+    reconcile()
+    window.addEventListener('online', reconcile)
+    window.addEventListener('paperphone:network-changed', reconcile)
+    return () => {
+      cancelled = true
+      window.removeEventListener('online', reconcile)
+      window.removeEventListener('paperphone:network-changed', reconcile)
+    }
+  }, [token, user?.id, hydratedAccount])
 
   const unlockPresentationAtStartup = async (event: React.FormEvent) => {
     event.preventDefault()

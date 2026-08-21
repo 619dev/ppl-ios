@@ -14,6 +14,7 @@ All notable changes and new features are recorded here. Historical entries below
 - Made native Tor control authentication recover from stale simulator cookies and startup cookie-replacement races instead of remaining permanently offline.
 - Fixed private-message encryption after text-appearance unlock by no longer treating the Ed25519 signing key as an ML-KEM public key; optional ML-KEM failures now reliably fall back to X25519.
 - Restored Android-to-iOS private-message decryption by detecting Android's legacy 56-byte X25519 envelope before parsing versioned hybrid headers.
+- Reconciles the iOS public identity with its local private key after Tor/network recovery, fixing Android messages encrypted to a stale server-side iOS public key.
 - Updated the application and Share Extension versions to 3.0.16 and incremented the iOS build number to 51.
 
 - 修复已有登录会话冷启动时未启动内置 Tor、导致 WebSocket 一直重连的问题。
@@ -24,6 +25,7 @@ All notable changes and new features are recorded here. Historical entries below
 - 修复模拟器残留 Tor 控制认证 cookie 或启动时 cookie 替换竞态导致永久离线的问题，认证失败后会重新读取并重试。
 - 修复文本外观已经解锁后私聊仍可能提示加密失败的问题：不再把 Ed25519 签名公钥误作 ML-KEM 公钥，并确保可选 ML-KEM 异常时可靠回退到 X25519。
 - 修复 Android 端发来的私聊消息无法解密的问题：识别 Android 旧版 56 字节 X25519 消息头，再按对应协议解密，实时消息与历史消息均兼容。
+- 网络或 Tor 恢复后自动校验并同步 iOS 本地私钥对应的服务端公钥，修复 Android 使用服务端旧公钥加密、导致 iOS 无法解密新消息的问题。
 - App 与分享扩展版本统一更新为 3.0.16，iOS 构建号递增至 51。
 
 ---
