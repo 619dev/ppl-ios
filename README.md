@@ -6,6 +6,14 @@ PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Ca
 
 当前 iOS 版本：`3.0.16 (51)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
+## 3.0.16 更新摘要
+
+- 修复已有登录会话冷启动时内嵌 Tor 未正确启动、WebSocket 持续重连的问题，并增强 Tor 控制认证的启动竞态恢复。
+- 修复文本外观密码已经解锁后，令牌刷新再次加载安全状态并清除内存密码的问题。
+- 已有会话启动时恢复本地身份密钥，并在网络恢复后校验服务端身份公钥与本地私钥是否匹配。
+- 私聊消息封装、KEM 回退、密钥结构以及实时和历史消息解密路径与同版本 Android 客户端保持一致。
+- 已在完全抹除的 iPhone 17 Pro Max 模拟器上，使用全新的 Keychain、WebView 数据和 DerivedData 验证登录、联网、双向消息解密及文件传输。
+
 ## 隐私与网络模型
 
 PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的公开 IP 由 Tor 隐藏，Android 与 iOS 客户端均使用内嵌 Tor 访问 `.onion` 地址，不提供应用服务器的明网回退。应用每次启动都会启动 Tor，包括直接恢复已有登录会话；直连 20 秒仍未建链时，客户端会从 Tor Project Moat 获取 WebTunnel 网桥并自动切换。WebTunnel 仅用于帮助建立 Tor 线路，应用业务流量仍通过内嵌 Tor 访问 onion service。
@@ -74,6 +82,8 @@ cd ios/App && pod install
 ```
 
 随后使用 Xcode 打开 `ios/App/App.xcworkspace`（不要打开 `.xcodeproj`），配置自己的签名并运行。任何 `.p8`、`.mobileprovision`、IPA 和其他签名材料都不应提交到源码仓库。
+
+命令行构建也必须指定 `ios/App/App.xcworkspace`；直接构建 `.xcodeproj` 不会把 CocoaPods 中的 Tor 与 IPtProxy target 加入完整依赖图，干净环境下会出现模块无法解析。
 
 App Store 发行包使用 Bundle ID `com.fm619tech.paperphonelite`；分享扩展使用 `com.fm619tech.paperphonelite.share`。归档和上传需要发行者自己的 Apple Distribution 证书、对应 App Store provisioning profiles，以及 App Store Connect 权限。
 

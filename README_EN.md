@@ -6,6 +6,14 @@ The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and
 
 Current iOS release: `3.0.16 (51)`; bundle ID: `com.fm619tech.paperphonelite`.
 
+## 3.0.16 release highlights
+
+- Fixed embedded Tor not starting for a restored signed-in session, which left WebSocket reconnecting indefinitely, and hardened Tor control authentication against startup races.
+- Fixed access-token refresh rehydrating secure presentation state and clearing a password that had already been unlocked in memory.
+- Restores local identity keys for persisted sessions and reconciles the server public identity with the corresponding local private key after network recovery.
+- Keeps private-message envelopes, KEM fallback, key bundles, and live/history decryption paths aligned with the matching Android client.
+- Verified login, connectivity, bidirectional message decryption, and file transfer on a fully erased iPhone 17 Pro Max simulator with fresh Keychain, WebView data, and DerivedData.
+
 ## Privacy and network model
 
 Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback for the application server. Every app launch starts Tor, including launches that restore an existing signed-in session; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically. WebTunnel assists Tor bootstrap only; application traffic continues to reach the onion service through the embedded Tor client.
@@ -74,6 +82,8 @@ cd ios/App && pod install
 ```
 
 Open `ios/App/App.xcworkspace` in Xcode (not the `.xcodeproj`), configure your own signing, and run. Never commit `.p8`, `.mobileprovision`, IPA, or other signing material to the source repository.
+
+Command-line builds must also target `ios/App/App.xcworkspace`. Building the `.xcodeproj` directly omits the complete CocoaPods dependency graph for Tor and IPtProxy and can fail to resolve those modules in a clean environment.
 
 The App Store build uses `com.fm619tech.paperphonelite`; its Share Extension uses `com.fm619tech.paperphonelite.share`. Archiving and upload require the distributor's Apple Distribution certificate, matching App Store provisioning profiles, and App Store Connect access.
 

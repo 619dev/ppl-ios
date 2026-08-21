@@ -14,6 +14,7 @@ All notable changes and new features are recorded here. Historical entries below
 - Made native Tor control authentication recover from stale simulator cookies and startup cookie-replacement races instead of remaining permanently offline.
 - Reconciles the iOS public identity with its local private key after Tor/network recovery, fixing Android messages encrypted to a stale server-side iOS public key.
 - Realigned the iOS private-message envelope, KEM fallback, key bundle, and live/history decrypt paths exactly with the working Android client implementation.
+- Verified the final build on a fully erased simulator with fresh application data, WebView storage, Keychain, and DerivedData; login, Tor connectivity, bidirectional encrypted messaging, and file transfer all passed.
 - Updated the application and Share Extension versions to 3.0.16 and incremented the iOS build number to 51.
 
 - 修复已有登录会话冷启动时未启动内置 Tor、导致 WebSocket 一直重连的问题。
@@ -24,6 +25,7 @@ All notable changes and new features are recorded here. Historical entries below
 - 修复模拟器残留 Tor 控制认证 cookie 或启动时 cookie 替换竞态导致永久离线的问题，认证失败后会重新读取并重试。
 - 网络或 Tor 恢复后自动校验并同步 iOS 本地私钥对应的服务端公钥，修复 Android 使用服务端旧公钥加密、导致 iOS 无法解密新消息的问题。
 - iOS 私聊消息封装、KEM 回退、密钥结构以及实时/历史消息解密路径已与运行正常的 Android 客户端实现逐项对齐。
+- 最终构建已在完全抹除、重新生成应用数据、WebView 存储、Keychain 和 DerivedData 的模拟器上验证；登录、Tor 联网、双向加密消息与文件传输均正常。
 - App 与分享扩展版本统一更新为 3.0.16，iOS 构建号递增至 51。
 
 ---
