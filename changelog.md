@@ -4,6 +4,24 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.12 (iOS build 48) — 2026-08-21
+
+- Synchronized the shared client with PaperPhoneLite upstream 3.0.12.
+- Added authenticated attachment downloads through the configured PaperPhoneLite server, including one automatic access-token refresh and retry.
+- File messages now open the native iOS share/save sheet when supported, with an in-WebView download fallback.
+- Restricted attachment downloads to same-origin `/api/files/` URLs so onion links are not handed to the system browser and cross-origin files are rejected.
+- Added localized download-failure messages for Chinese, English, Japanese, Korean, French, German, Russian, and Spanish.
+- Updated the application version to 3.0.12 and incremented the iOS build number to 48 while preserving the existing Tor, Keychain, notifications, Share Extension, and iPad adaptations.
+
+- 公共客户端代码同步至 PaperPhoneLite 上游 3.0.12。
+- 新增通过当前 PaperPhoneLite 服务器鉴权下载附件；访问令牌过期时会自动刷新一次并重试。
+- 文件消息在环境支持时调起 iOS 系统分享/存储面板，并保留 WebView 内下载回退。
+- 附件下载仅允许当前服务器同源的 `/api/files/` 地址，避免将 onion 链接交给系统浏览器，并拒绝跨来源文件。
+- 为中文、英文、日文、韩文、法文、德文、俄文和西班牙文补充下载失败提示。
+- 应用版本更新为 3.0.12，iOS 构建号递增至 48，同时保留现有 Tor、Keychain、本地通知、分享扩展和 iPad 适配。
+
+---
+
 ## 3.0.8 (iOS build 47) — 2026-08-19
 
 - Added native responsive layouts for every supported iPad size, orientation, Split View width, and Stage Manager window size.

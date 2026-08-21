@@ -1,10 +1,10 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前代码已同步至上游 PaperPhoneLite 3.0.12。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.8 (47)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.12 (48)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
 ## 隐私与网络模型
 
@@ -18,6 +18,7 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 
 - 私聊与群聊、联系人和群组管理
 - 文字、图片、视频、语音、文件、表情与贴纸消息
+- 通过当前 PaperPhoneLite 服务器鉴权下载附件，并在 iOS 系统分享面板中保存或转发文件
 - X25519 与 ML-KEM-768 混合密钥协商、XSalsa20-Poly1305 消息加密
 - 加密群聊 Sender Key、会话安全号码验证
 - 可选的额外消息密码与八种密文文本外观
@@ -75,6 +76,8 @@ cd ios/App && pod install
 随后使用 Xcode 打开 `ios/App/App.xcworkspace`（不要打开 `.xcodeproj`），配置自己的签名并运行。任何 `.p8`、`.mobileprovision`、IPA 和其他签名材料都不应提交到源码仓库。
 
 App Store 发行包使用 Bundle ID `com.fm619tech.paperphonelite`；分享扩展使用 `com.fm619tech.paperphonelite.share`。归档和上传需要发行者自己的 Apple Distribution 证书、对应 App Store provisioning profiles，以及 App Store Connect 权限。
+
+附件下载只接受当前已配置服务器同源的 `/api/files/` 地址，并携带当前登录令牌；令牌过期时客户端会先刷新会话再重试。此限制可防止附件按钮把 onion URL 交给系统浏览器，或下载其他来源的非预期内容。
 
 ## 数据与自托管责任
 

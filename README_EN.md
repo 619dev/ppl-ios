@@ -1,10 +1,10 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current code is synchronized with PaperPhoneLite upstream 3.0.12.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.8 (47)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.12 (48)`; bundle ID: `com.fm619tech.paperphonelite`.
 
 ## Privacy and network model
 
@@ -18,6 +18,7 @@ The project also integrates no FCM, Firebase, OneSignal, or Web Push. Android ma
 
 - Private and group chats, contacts, and group management
 - Text, image, video, voice, file, emoji, and sticker messages
+- Authenticated attachment downloads through the configured PaperPhoneLite server, with the iOS share sheet for saving or forwarding files
 - Hybrid X25519 and ML-KEM-768 key agreement with XSalsa20-Poly1305 message encryption
 - Sender Keys for encrypted groups and safety-number verification
 - Optional extra message password with eight ciphertext text appearances
@@ -75,6 +76,8 @@ cd ios/App && pod install
 Open `ios/App/App.xcworkspace` in Xcode (not the `.xcodeproj`), configure your own signing, and run. Never commit `.p8`, `.mobileprovision`, IPA, or other signing material to the source repository.
 
 The App Store build uses `com.fm619tech.paperphonelite`; its Share Extension uses `com.fm619tech.paperphonelite.share`. Archiving and upload require the distributor's Apple Distribution certificate, matching App Store provisioning profiles, and App Store Connect access.
+
+Attachment downloads accept only same-origin `/api/files/` URLs from the currently configured server and include the active login token. If that token has expired, the client refreshes the session and retries. This prevents attachment actions from handing onion URLs to the system browser or downloading unexpected cross-origin content.
 
 ## Data and self-hosting responsibility
 
