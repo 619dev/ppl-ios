@@ -1,14 +1,14 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current code includes the shared client updates from PaperPhoneLite 3.0.15.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.16.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.15 (50)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.16 (51)`; bundle ID: `com.fm619tech.paperphonelite`.
 
 ## Privacy and network model
 
-Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback for the application server. The login and registration screen starts Tor automatically; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically. WebTunnel assists Tor bootstrap only; application traffic continues to reach the onion service through the embedded Tor client.
+Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback for the application server. Every app launch starts Tor, including launches that restore an existing signed-in session; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically. WebTunnel assists Tor bootstrap only; application traffic continues to reach the onion service through the embedded Tor client.
 
 This project does not use Apple Push Notification service (APNs) at all. It does not register APNs device tokens or send device tokens or notification payloads to Apple, an official relay, or any other APNs relay. APNs requires delivery through clearnet push infrastructure and a relay, which conflicts with the trust and metadata boundary of a Tor-only deployment. When iOS suspends or terminates the app, it receives no remote background message notifications. While the app is running and connected, WebSocket events may produce on-device local notifications and in-app alerts.
 

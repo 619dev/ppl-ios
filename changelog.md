@@ -4,6 +4,20 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.16 (iOS build 51) — 2026-08-21
+
+- Fixed native Tor startup for persisted signed-in sessions so cold launches no longer remain stuck in WebSocket reconnection.
+- Native Tor now starts at the application root, and WebSocket recovery is triggered immediately after the WebKit proxy becomes ready.
+- Improved the startup text-appearance password prompt so its visibility stays synchronized with the actual encryption lock state.
+- Updated the application and Share Extension versions to 3.0.16 and incremented the iOS build number to 51.
+
+- 修复已有登录会话冷启动时未启动内置 Tor、导致 WebSocket 一直重连的问题。
+- 内置 Tor 现于应用根层启动，并在 WebKit 代理就绪后立即触发 WebSocket 恢复连接。
+- 改进启动时的文本外观密码弹窗，使其显示状态始终与实际加密锁定状态同步。
+- App 与分享扩展版本统一更新为 3.0.16，iOS 构建号递增至 51。
+
+---
+
 ## 3.0.15 (iOS build 50) — 2026-08-21
 
 - Synchronized the shared client updates from PaperPhoneLite 3.0.15 while preserving the iOS Tor, Keychain, notifications, Share Extension, calling, and iPad adaptations.

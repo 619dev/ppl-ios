@@ -23,6 +23,7 @@ import { useAutoDeleteCleanup } from './hooks/useAutoDeleteCleanup'
 import { initLocalNotifications } from './api/localNotification'
 import { setAppBadgeCount } from './api/appBadge'
 import { useI18n } from './hooks/useI18n'
+import { isNativeTorPlatform, onTorStatusChange, startTor } from './api/tor-bridge'
 
 function ProtectedLayout() {
   useSocket()
@@ -108,6 +109,42 @@ export default function App() {
   const [presentationUnlockBusy, setPresentationUnlockBusy] = useState(false)
   const { t } = useI18n()
 
+  // A persisted session bypasses the login page, so native Tor must be
+  // started at the app root. Otherwise every HTTP/WS request to the onion
+  // service is attempted before a WebKit proxy exists and reconnects forever.
+  useEffect(() => {
+    if (!isNativeTorPlatform) return
+    let cancelled = false
+    let removeListener: (() => void) | undefined
+
+    onTorStatusChange(state => {
+      if (state.ready) window.dispatchEvent(new Event('paperphone:network-changed'))
+    }).then(handle => {
+      if (cancelled) void handle?.remove()
+      else if (handle) removeListener = () => void handle.remove()
+    }).catch(error => console.warn('[Tor] Status listener failed:', error))
+
+    startTor().then(state => {
+      if (!cancelled && state.ready) window.dispatchEvent(new Event('paperphone:network-changed'))
+    }).catch(error => console.error('[Tor] Startup failed:', error))
+
+    return () => {
+      cancelled = true
+      removeListener?.()
+    }
+  }, [])
+
+  const syncPresentationUnlockPrompt = () => {
+    const shouldPrompt = Boolean(useStore.getState().token && useStore.getState().user?.id)
+      && getPresentationSettings().enabled
+      && !isPresentationUnlocked()
+    setShowPresentationUnlock(shouldPrompt)
+    if (!shouldPrompt) {
+      setPresentationPassword('')
+      setPresentationUnlockError('')
+    }
+  }
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
@@ -121,12 +158,15 @@ export default function App() {
     Promise.all([loadFromIndexedDB(user.id), hydrateSenderKeys(user.id), hydratePresentationCrypto(user.id)])
       .then(() => {
         if (cancelled) return
-        if (getPresentationSettings().enabled) setShowPresentationUnlock(true)
+        syncPresentationUnlockPrompt()
         setHydratedAccount(user.id)
       })
       .catch(err => {
         console.error('[App] Secure crypto state hydration failed:', err)
-        if (!cancelled) setHydratedAccount(user.id)
+        if (!cancelled) {
+          syncPresentationUnlockPrompt()
+          setHydratedAccount(user.id)
+        }
       })
     return () => { cancelled = true }
   }, [token, user?.id])
@@ -157,13 +197,15 @@ export default function App() {
   useEffect(() => {
     const onVisibility = () => handlePresentationAppState(document.visibilityState === 'visible')
     const onPresentationState = () => {
-      if (isPresentationUnlocked()) return
-      const messages = useStore.getState().messages
-      const locked = Object.fromEntries(Object.entries(messages).map(([chatId, items]) => [
-        chatId,
-        items.map(({ decrypted, ...message }) => ({ ...message, ...(presentationCiphertextForPlaintext(decrypted) ? { decrypted: presentationCiphertextForPlaintext(decrypted) } : {}) })),
-      ]))
-      useStore.setState({ messages: locked })
+      syncPresentationUnlockPrompt()
+      if (!isPresentationUnlocked()) {
+        const messages = useStore.getState().messages
+        const locked = Object.fromEntries(Object.entries(messages).map(([chatId, items]) => [
+          chatId,
+          items.map(({ decrypted, ...message }) => ({ ...message, ...(presentationCiphertextForPlaintext(decrypted) ? { decrypted: presentationCiphertextForPlaintext(decrypted) } : {}) })),
+        ]))
+        useStore.setState({ messages: locked })
+      }
     }
     document.addEventListener('visibilitychange', onVisibility)
     window.addEventListener('paperphone:presentation-state-changed', onPresentationState)
