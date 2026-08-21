@@ -1,10 +1,10 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current code includes the shared client updates from PaperPhoneLite Android 3.0.13.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current code includes the shared client updates from PaperPhoneLite 3.0.15.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.13 (49)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.15 (50)`; bundle ID: `com.fm619tech.paperphonelite`.
 
 ## Privacy and network model
 

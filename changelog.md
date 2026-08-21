@@ -4,6 +4,20 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.15 (iOS build 50) — 2026-08-21
+
+- Synchronized the shared client updates from PaperPhoneLite 3.0.15 while preserving the iOS Tor, Keychain, notifications, Share Extension, calling, and iPad adaptations.
+- Fixed received attachments remaining as styled ciphertext after private-chat or Sender Key decryption, restoring filenames and download access across devices.
+- Added a startup password prompt for signed-in accounts with text appearance encryption enabled, including localized incorrect-password feedback in all eight supported languages.
+- Updated the application version to 3.0.15 and incremented the iOS build number to 50.
+
+- 同步 PaperPhoneLite 3.0.15 的共享客户端更新，并保留 iOS 的 Tor、Keychain、本地通知、分享扩展、通话和 iPad 适配。
+- 修复私聊或 Sender Key 解密后，收到的附件仍停留在文本外观密文状态的问题，恢复跨设备文件名显示和下载访问。
+- 已登录账号启用文本外观加密时，App 启动后提示输入密码，并为全部八种语言补充密码错误提示。
+- 应用版本更新为 3.0.15，iOS 构建号递增至 50。
+
+---
+
 ## 3.0.13 (iOS build 49) — 2026-08-21
 
 - Synchronized the shared chat reliability updates from PaperPhoneLite Android 3.0.13.
