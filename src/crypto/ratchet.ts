@@ -201,7 +201,11 @@ export function inspectHybridProtocol(headerB64?: string | null): HybridProtocol
   if (!headerB64) return null
   try {
     const normalized = headerB64.replace(/-/g, '+').replace(/_/g, '/')
-    const version = atob(normalized)[0]?.charCodeAt(0)
+    const decoded = atob(normalized)
+    // Android clients predating the versioned hybrid envelope use a
+    // 32-byte ephemeral key followed by a 24-byte nonce (56 bytes total).
+    if (decoded.length === 56) return { version: 0, name: 'X25519', downgraded: true }
+    const version = decoded[0]?.charCodeAt(0)
     if (!version) return null
     if (version >= 2) return { version, name: 'X25519 + ML-KEM-768', downgraded: false }
     return { version, name: 'X25519', downgraded: true }
@@ -221,6 +225,16 @@ export async function decryptHybrid(
 ): Promise<string> {
   const sodium = await initSodium()
   const headerBytes = sodium.from_base64(headerB64)
+
+  // Backward compatibility with Android's original crypto_box envelope.
+  // Its header has no leading protocol byte: [32-byte ephemeral pub][24-byte
+  // nonce]. Treating its first random public-key byte as a version shifts the
+  // key and nonce offsets and makes every cross-platform message undecryptable.
+  if (headerBytes.length === sodium.crypto_box_PUBLICKEYBYTES + sodium.crypto_box_NONCEBYTES) {
+    const plaintext = await decrypt(headerB64, recipientPrivKey, ciphertextB64)
+    return unprotectPresentationText(plaintext)
+  }
+
   const ct = sodium.from_base64(ciphertextB64)
   const privKey = sodium.from_base64(recipientPrivKey)
 
