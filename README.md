@@ -1,10 +1,10 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前代码已同步至上游 PaperPhoneLite 3.0.12。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前代码已同步至 PaperPhoneLite Android 3.0.13 的共享客户端更新。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.12 (48)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.13 (49)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
 ## 隐私与网络模型
 

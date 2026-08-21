@@ -4,6 +4,20 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.13 (iOS build 49) — 2026-08-21
+
+- Synchronized the shared chat reliability updates from PaperPhoneLite Android 3.0.13.
+- Prevented rapid duplicate message sends, file uploads, and attachment saves with synchronous operation guards.
+- File messages now show an in-progress clock and disable the active download button while the authenticated attachment is being prepared for the iOS share/save sheet.
+- Updated the application version to 3.0.13 and incremented the iOS build number to 49.
+
+- 同步 PaperPhoneLite Android 3.0.13 的聊天可靠性更新。
+- 使用同步操作锁防止快速重复发送消息、上传文件和保存附件。
+- 鉴权附件正在准备并调起 iOS 分享/存储面板时，文件消息显示处理中图标并禁用当前下载按钮。
+- 应用版本更新为 3.0.13，iOS 构建号递增至 49。
+
+---
+
 ## 3.0.12 (iOS build 48) — 2026-08-21
 
 - Synchronized the shared client with PaperPhoneLite upstream 3.0.12.

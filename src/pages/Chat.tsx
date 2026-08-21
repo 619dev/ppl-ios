@@ -357,6 +357,7 @@ export default function Chat() {
   // Upload progress
   const [uploadProgress, setUploadProgress] = useState(-1) // -1 = hidden
   const [uploadLabel, setUploadLabel] = useState('')
+  const [savingAttachmentUrl, setSavingAttachmentUrl] = useState<string | null>(null)
   // Voice recording
   const [isRecording, setIsRecording] = useState(false)
   const [recordDuration, setRecordDuration] = useState(0)
@@ -371,6 +372,9 @@ export default function Chat() {
   const imageInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const sendingRef = useRef(false)
+  const fileUploadRef = useRef(false)
+  const attachmentSaveRef = useRef(false)
   const mediaRecRef = useRef<MediaRecorder | null>(null)
   const recChunksRef = useRef<Blob[]>([])
   const recStartRef = useRef<number>(0)
@@ -698,7 +702,8 @@ export default function Chat() {
   const sendMessage = async (text?: string, msgType = 'text', _extra: any = {}) => {
     const content = text || input.trim()
     if (msgType === 'text' && !content) return
-    if (!id || !user || sending) return
+    if (!id || !user || sendingRef.current) return
+    sendingRef.current = true
     const reply = replyingTo
     const displayWireContent = encodeMessagePayload(content, reply)
     const clientMsgId = crypto.randomUUID()
@@ -859,6 +864,7 @@ export default function Chat() {
       if (msgType === 'text' && content) setInput(content)
       alert(t('chat.encryption_send_failed') || 'Encryption failed. The message was not sent.')
     } finally {
+      sendingRef.current = false
       setSending(false)
     }
   }
@@ -903,15 +909,19 @@ export default function Chat() {
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
     e.target.value = ''
+    if (!file) return
+    if (fileUploadRef.current) return
+    fileUploadRef.current = true
     setShowAttachPanel(false)
     try {
       const { url } = await uploadWithProgress(file, t('chat.uploading_file'))
       const meta = JSON.stringify({ url, fileName: file.name, fileSize: file.size, fileType: file.type })
-      sendMessage(meta, 'file', { url, fileName: file.name, fileSize: file.size, fileType: file.type })
+      await sendMessage(meta, 'file', { url, fileName: file.name, fileSize: file.size, fileType: file.type })
     } catch {
       alert(t('chat.upload_failed'))
+    } finally {
+      fileUploadRef.current = false
     }
   }
 
@@ -1159,6 +1169,9 @@ export default function Chat() {
   }
 
   const saveAttachment = async (url: string, requestedName?: string, fileType?: string) => {
+    if (attachmentSaveRef.current) return
+    attachmentSaveRef.current = true
+    setSavingAttachmentUrl(url)
     try {
       const blob = await downloadFileFromServer(url)
       const fileName = (requestedName || 'attachment').replace(/[\\/:*?"<>|]/g, '_')
@@ -1189,6 +1202,9 @@ export default function Chat() {
     } catch (error) {
       console.error('[Chat] attachment download failed:', error)
       alert(t('chat.download_failed'))
+    } finally {
+      attachmentSaveRef.current = false
+      setSavingAttachmentUrl(null)
     }
   }
 
@@ -1238,7 +1254,7 @@ export default function Chat() {
       if (meta) {
         const icon = getFileIcon(meta.fileType || '')
         return (
-          <button type="button" onClick={() => void saveAttachment(meta.url, meta.fileName, meta.fileType)}
+          <button type="button" disabled={savingAttachmentUrl === meta.url} onClick={() => void saveAttachment(meta.url, meta.fileName, meta.fileType)}
             style={{
               display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit',
               padding: 8, borderRadius: 8, background: 'rgba(0,0,0,0.05)', minWidth: 180,
@@ -1251,7 +1267,7 @@ export default function Chat() {
               </div>
               {meta.fileSize && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{formatFileSize(meta.fileSize)}</div>}
             </div>
-            <span style={{ fontSize: 18, color: 'var(--accent)' }}><Download size={18} /></span>
+            <span style={{ fontSize: 18, color: 'var(--accent)' }}>{savingAttachmentUrl === meta.url ? <Clock size={18} /> : <Download size={18} />}</span>
           </button>
         )
       }
