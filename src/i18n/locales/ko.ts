@@ -70,6 +70,7 @@ export const ko: Record<string, string> = {
   'profile.my_qr': '내 QR 코드', 'profile.qr_scan_hint': '이 QR 코드를 스캔하여 친구로 추가',
   'profile.notifications': '알림',
   'ntfy.title': 'ntfy 푸시 (중국 Android)', 'ntfy.description': 'Android 기기가 Google 서비스를 지원하지 않는 경우(Huawei 등), ntfy를 통해 푸시 알림을 받을 수 있습니다.', 'ntfy.step1': '1. 앱 스토어에서 ntfy 앱을 설치하세요', 'ntfy.step2': '2. ntfy 앱에서 +를 탭하고 다음 주제를 구독하세요:', 'ntfy.step3': '3. 아래 버튼을 탭하여 등록하세요', 'ntfy.register': '푸시 등록', 'ntfy.registered': '✅ 등록됨', 'ntfy.copy_topic': '주제 복사', 'ntfy.copied': '복사됨', 'ntfy.download_ntfy': 'ntfy 앱 다운로드', 'ntfy.register_failed': '등록 실패, 다시 시도해 주세요',
+  'bark.title': 'Bark 알림', 'bark.description': '오프라인일 때 새 메시지 알림을 설정한 Bark URL로 보냅니다. 메시지 본문은 포함되지 않습니다.', 'bark.endpoint': 'Bark URL', 'bark.endpoint_hint': '기기 키가 포함된 전체 URL을 붙여넣으세요.', 'bark.apns_notice': '자체 호스팅 서버를 사용해도 Bark iOS 앱은 최종적으로 Apple APNs를 사용합니다.', 'bark.configured': 'Bark 활성화됨', 'bark.not_configured': 'Bark 설정 안 됨', 'bark.saved': 'Bark 설정 저장됨', 'bark.test': '테스트 보내기', 'bark.test_sent': '테스트 알림 전송됨', 'bark.disable': 'Bark 비활성화', 'bark.disabled': 'Bark 비활성화됨', 'bark.invalid_url': '유효한 HTTP 또는 HTTPS URL을 입력하세요', 'bark.missing_key': 'Bark URL에 기기 키가 필요합니다', 'bark.server_unsupported': '현재 서버는 아직 Bark를 지원하지 않습니다.',
 
   'call.incoming': '수신 전화', 'call.outgoing': '발신 중...', 'call.connected': '통화 중',
   'call.ended': '통화 종료', 'call.video': '영상 통화', 'call.voice': '음성 통화',

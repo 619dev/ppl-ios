@@ -39,8 +39,8 @@ export default function PrivacyPolicy() {
             : 'Sender and recipient or group identifiers, message identifiers, type, time, delivery/read status, client sequence, expiry settings, key version, and information needed for WebSocket operation, synchronization, and deduplication. The project has no social feed, timeline, public-post, or report-review data.'}</p>
           <h4>{zh ? '设备与会话数据' : 'Device and session data'}</h4>
           <p>{zh
-            ? '设备名称和类型、操作系统、客户端或浏览器标识、会话标识、登录和最后活动时间、刷新令牌哈希，以及服务器可见的连接信息。Tor 用于降低来源 IP 暴露，但服务器、设备，以及用户可选的 ntfy 实例仍可能产生其他可关联元数据。iOS 不使用 APNs。'
-            : 'Device name and type, operating system, client or browser identifier, session identifier, login and last-active times, refresh-token hash, and connection information visible to the server. Tor reduces source-IP exposure, but the server, device, and an optional user-selected ntfy instance may still create other linkable metadata. iOS does not use APNs.'}</p>
+            ? '设备名称和类型、操作系统、客户端或浏览器标识、会话标识、登录和最后活动时间、刷新令牌哈希，以及服务器可见的连接信息。Tor 用于降低来源 IP 暴露，但服务器、设备，以及用户可选的 ntfy 或 Bark 实例仍可能产生其他可关联元数据。'
+            : 'Device name and type, operating system, client or browser identifier, session identifier, login and last-active times, refresh-token hash, and connection information visible to the server. Tor reduces source-IP exposure, but the server, device, and an optional user-selected ntfy or Bark instance may still create other linkable metadata.'}</p>
         </Section>
 
         <Section icon={<Lock size={20} />} title={zh ? '3. 消息加密与限制' : '3. Message Encryption and Limits'}>
@@ -66,8 +66,8 @@ export default function PrivacyPolicy() {
 
         <Section icon={<Bell size={20} />} title={zh ? '6. 通知服务与第三方' : '6. Notifications and Third Parties'}>
           <p>{zh
-            ? 'Android 可使用 ntfy 接收后台通知：服务器会向运营者配置的 ntfy 实例发送主题、通知标题和正文；使用公共实例时，该实例运营者会按其政策处理这些数据。iOS 客户端不使用 Apple Push Notification service（APNs），当前也不提供系统后台远程通知；应用打开且保持连接时仍可显示应用内消息提醒。本项目不使用 APNs、Web Push、FCM、Firebase 或 OneSignal，也不集成 Apple 或 Google 的推送框架。ntfy 通知内容可能出现在锁屏，请在 ntfy App 和操作系统中调整预览设置。'
-            : 'Android can use ntfy for background notifications: the server sends a topic, notification title, and body to the operator-configured ntfy instance, and a public instance processes that data under its operator’s policy. The iOS client does not use Apple Push Notification service (APNs) and currently provides no system background remote notifications; in-app message alerts can still appear while the app is open and connected. The project uses no APNs, Web Push, FCM, Firebase, or OneSignal and integrates neither Apple nor Google push frameworks. ntfy notification content may appear on a lock screen, so adjust preview settings in the ntfy app and operating system.'}</p>
+            ? 'Android 可使用 ntfy 接收后台通知。iOS 用户可选择提交 Bark 推送地址；服务器向 Bark 发送发件人名称和通用的新消息提示，不发送消息正文。PaperPhoneLite 本身不注册 APNs 设备令牌，但 Bark iOS App 最终通过 Apple APNs 接收通知。公共 ntfy、Bark 服务及 Apple 会按各自政策处理投递所需数据，通知也可能出现在锁屏。'
+            : 'Android can use ntfy for background notifications. iOS users may submit a Bark endpoint; the server sends Bark the sender name and a generic new-message alert, not message content. PaperPhoneLite itself registers no APNs device token, but the Bark iOS app ultimately receives alerts through Apple APNs. Public ntfy or Bark services and Apple process delivery data under their own policies, and alerts may appear on the lock screen.'}</p>
         </Section>
 
         <Section icon={<Users size={20} />} title={zh ? '7. 使用目的与信息披露' : '7. Purposes and Disclosure'}>
@@ -78,8 +78,8 @@ export default function PrivacyPolicy() {
 
         <Section icon={<Trash2 size={20} />} title={zh ? '8. 保留、删除与您的选择' : '8. Retention, Deletion, and Your Choices'}>
           <p>{zh
-            ? '消息可设置永不删除或在 1、3、7、30 天后自动删除。您可以清理本地缓存、撤销设备会话、拉黑用户或提交账号删除请求。账号删除会触发服务器数据库中的关联记录删除，但离线设备、接收方副本、已启用的 ntfy 服务记录和服务器备份可能按各自周期继续存在。删除前请自行导出或备份需要的数据。具体访问、更正、删除或异议权取决于适用法律，应联系所选服务器运营者。'
-            : 'Messages may be retained indefinitely or expire after 1, 3, 7, or 30 days. You may clear local cache, revoke device sessions, block users, or request account deletion. Account deletion triggers removal of related server database records, but offline devices, recipient copies, records held by an enabled ntfy service, and server backups may persist according to their own cycles. Export or back up anything needed before deletion. Rights of access, correction, deletion, or objection depend on applicable law and should be directed to the selected server operator.'}</p>
+            ? '消息可设置永不删除或在 1、3、7、30 天后自动删除。您可以清理本地缓存、撤销设备会话、停用 Bark、拉黑用户或提交账号删除请求。账号删除会移除服务器中的通知订阅，但离线设备、接收方副本、ntfy 或 Bark 服务记录和服务器备份可能按各自周期继续存在。'
+            : 'Messages may be retained indefinitely or expire after 1, 3, 7, or 30 days. You may clear local cache, revoke device sessions, disable Bark, block users, or request account deletion. Account deletion removes notification subscriptions from the server, but offline devices, recipient copies, ntfy or Bark records, and backups may persist under their own cycles.'}</p>
         </Section>
 
         <Section icon={<Baby size={20} />} title={zh ? '9. 未成年人' : '9. Children'}>

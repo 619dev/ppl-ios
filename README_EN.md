@@ -1,26 +1,25 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.16.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.17.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.16 (51)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.17 (52)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.0.16 release highlights
+## 3.0.17 release highlights
 
-- Fixed embedded Tor not starting for a restored signed-in session, which left WebSocket reconnecting indefinitely, and hardened Tor control authentication against startup races.
-- Fixed access-token refresh rehydrating secure presentation state and clearing a password that had already been unlocked in memory.
-- Restores local identity keys for persisted sessions and reconciles the server public identity with the corresponding local private key after network recovery.
-- Keeps private-message envelopes, KEM fallback, key bundles, and live/history decryption paths aligned with the matching Android client.
-- Verified login, connectivity, bidirectional message decryption, and file transfer on a fully erased iPhone 17 Pro Max simulator with fresh Keychain, WebView data, and DerivedData.
+- Added optional Bark background-message alerts for iOS, configurable, testable, and removable from the Profile page.
+- Bark alerts contain only the sender name and a generic new-message notice, never message content; Bark endpoints are not stored in WebView storage.
+- Updated all eight UI languages together with the privacy policy, terms of use, and notification documentation.
+- Updated the app and Share Extension to 3.0.17 and incremented the iOS build number to 52.
 
 ## Privacy and network model
 
 Production PaperPhoneLite servers run as Tor v3 onion services. Tor conceals the server's public IP, and both Android and iOS use an embedded Tor client to reach `.onion` addresses, with no clearnet fallback for the application server. Every app launch starts Tor, including launches that restore an existing signed-in session; if a direct circuit is not established within 20 seconds, the client obtains a WebTunnel bridge from Tor Project Moat and switches automatically. WebTunnel assists Tor bootstrap only; application traffic continues to reach the onion service through the embedded Tor client.
 
-This project does not use Apple Push Notification service (APNs) at all. It does not register APNs device tokens or send device tokens or notification payloads to Apple, an official relay, or any other APNs relay. APNs requires delivery through clearnet push infrastructure and a relay, which conflicts with the trust and metadata boundary of a Tor-only deployment. When iOS suspends or terminates the app, it receives no remote background message notifications. While the app is running and connected, WebSocket events may produce on-device local notifications and in-app alerts.
+The app itself does not register an Apple Push Notification service (APNs) device token. iOS users may optionally configure Bark: the PaperPhoneLite server sends only the sender name and a generic new-message alert to Bark, whose iOS app displays it through APNs. Without Bark, a suspended or terminated app receives no remote background notification. While running and connected, WebSocket events can still produce local notifications and in-app alerts.
 
-The project also integrates no FCM, Firebase, OneSignal, or Web Push. Android may optionally use ntfy if enabled by the user or server operator. ntfy is an independent third party, and its privacy and metadata risks depend on the selected instance.
+The project also integrates no FCM, Firebase, OneSignal, or Web Push. Android may optionally use ntfy and iOS may optionally use Bark. These are independent third parties, and their privacy and metadata risks depend on the selected instance.
 
 ## Current functionality
 
@@ -45,7 +44,7 @@ The Lite client does not provide Moments, Timeline, public posting, voice calls,
 | Platform/state | Behavior |
 |---|---|
 | iOS running with WebSocket connected | In-app alerts; local system notifications when permission is granted |
-| iOS suspended or terminated | No remote background notification; messages synchronize when reopened |
+| iOS suspended or terminated | Bark app alert when configured; otherwise messages synchronize when reopened |
 | Android | Optional ntfy depending on client and server configuration |
 
 Local notifications are created on the device from messages already received through Tor/WebSocket; they do not pass through APNs. The home-screen badge reflects only the unread state currently known to the app and does not imply background delivery.

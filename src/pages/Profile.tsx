@@ -12,9 +12,11 @@ import { Camera, ChevronLeft, ChevronRight, Smartphone, Check, Copy, KeyRound, S
 import { clearOfflineCache } from '../utils/offlineCache'
 import { PRESENTATION_CODECS, type PresentationCodecId } from '../crypto/presentationCodec'
 import { disablePresentationCrypto, enablePresentationCrypto, getPresentationSettings, isPresentationUnlocked, lockPresentationCrypto, unlockPresentationCrypto, updatePresentationSettings } from '../crypto/presentationCrypto'
+import { deleteBarkEndpoint, getBarkStatus, normalizeBarkEndpoint, saveBarkEndpoint, testBarkEndpoint } from '../api/bark'
+import { getPlatform } from '../utils/platform'
 
-type SubView = null | 'password' | 'avatar' | '2fa' | 'sessions' | 'language' | 'fingerprint' | 'myqr' | 'proxy' | 'message-privacy'
-const APP_VERSION = '3.0.16'
+type SubView = null | 'password' | 'avatar' | '2fa' | 'sessions' | 'language' | 'fingerprint' | 'myqr' | 'proxy' | 'message-privacy' | 'bark'
+const APP_VERSION = '3.0.17'
 
 export default function Profile() {
   const { t } = useI18n()
@@ -37,6 +39,7 @@ export default function Profile() {
   const [ntfyLoading, setNtfyLoading] = useState(false)
   const [ntfyCopied, setNtfyCopied] = useState(false)
   const isAndroid = /Android/i.test(navigator.userAgent)
+  const isIOS = getPlatform() === 'ios'
 
   useEffect(() => {
     if (!isAndroid) return
@@ -119,6 +122,7 @@ export default function Profile() {
   if (subView === 'myqr') return <MyQRCode onBack={() => setSubView(null)} t={t} user={user} />
   if (subView === 'proxy') return <ProxySettings onBack={() => setSubView(null)} t={t} />
   if (subView === 'message-privacy') return <MessagePrivacySettings onBack={() => setSubView(null)} t={t} />
+  if (subView === 'bark') return <BarkSettings onBack={() => setSubView(null)} t={t} />
 
   return (
     <div className="page" id="profile-page">
@@ -195,6 +199,12 @@ export default function Profile() {
           <span className="label"><Trash2 size={16} /> {t('profile.clear_cache')}</span>
           <span className="value">{clearingCache ? t('common.loading') : ''}</span>
         </div>
+        {isIOS && (
+          <div className="settings-item" onClick={() => setSubView('bark')}>
+            <span className="label"><Bell size={16} /> {t('bark.title')}</span>
+            <span className="arrow"><ChevronRight size={14} /></span>
+          </div>
+        )}
 
         {/* ntfy Push for Android without Google services */}
         {isAndroid && ntfyTopic && (
@@ -354,6 +364,114 @@ export default function Profile() {
               </div>
             </div>
           </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function BarkSettings({ onBack, t }: { onBack: () => void; t: (k: string) => string }) {
+  const [endpoint, setEndpoint] = useState('')
+  const [endpointHint, setEndpointHint] = useState('')
+  const [configured, setConfigured] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [busy, setBusy] = useState(false)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    getBarkStatus()
+      .then(status => {
+        setConfigured(status.configured)
+        setEndpointHint(status.endpoint_hint || '')
+      })
+      .catch(() => setError(t('bark.server_unsupported')))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const run = async (action: () => Promise<void>, success: string) => {
+    setBusy(true)
+    setError('')
+    setMessage('')
+    try {
+      await action()
+      setMessage(success)
+    } catch (e: any) {
+      if (e?.message === 'invalid_url') setError(t('bark.invalid_url'))
+      else if (e?.message === 'missing_key') setError(t('bark.missing_key'))
+      else setError(e?.message || t('common.error'))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const save = () => run(async () => {
+    const normalized = normalizeBarkEndpoint(endpoint)
+    await saveBarkEndpoint(normalized)
+    setConfigured(true)
+    setEndpointHint(new URL(normalized).origin + '/••••••')
+    setEndpoint('')
+  }, t('bark.saved'))
+
+  const test = () => run(() => testBarkEndpoint(endpoint || undefined), t('bark.test_sent'))
+
+  const remove = () => run(async () => {
+    await deleteBarkEndpoint()
+    setConfigured(false)
+    setEndpointHint('')
+    setEndpoint('')
+  }, t('bark.disabled'))
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <button className="back-btn" onClick={onBack}><ChevronLeft size={20} /></button>
+        <h1>{t('bark.title')}</h1>
+      </div>
+      <div className="page-body" style={{ padding: 16 }}>
+        <div style={{ padding: 16, borderRadius: 12, background: 'var(--bg-card)', lineHeight: 1.6 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600, marginBottom: 8 }}>
+            <Bell size={18} /> {configured ? t('bark.configured') : t('bark.not_configured')}
+          </div>
+          <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{t('bark.description')}</div>
+          {endpointHint && <code style={{ display: 'block', marginTop: 10, wordBreak: 'break-all' }}>{endpointHint}</code>}
+        </div>
+
+        <div className="section-title" style={{ marginTop: 20 }}>{t('bark.endpoint')}</div>
+        <input
+          className="input"
+          type="url"
+          inputMode="url"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          value={endpoint}
+          onChange={e => setEndpoint(e.target.value)}
+          placeholder="https://bark.example.com/device-key"
+          aria-label={t('bark.endpoint')}
+        />
+        <div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.6, marginTop: 8 }}>
+          {t('bark.endpoint_hint')}
+        </div>
+        <div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: 1.6, marginTop: 8 }}>
+          {t('bark.apns_notice')}
+        </div>
+
+        {error && <div className="error-msg" style={{ marginTop: 12 }}>{error}</div>}
+        {message && <div style={{ color: 'var(--success)', fontSize: 13, marginTop: 12 }}>{message}</div>}
+
+        <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
+          <button className="btn btn-primary" disabled={busy || loading || !endpoint.trim()} onClick={save} style={{ flex: 1 }}>
+            {busy ? t('common.loading') : t('common.save')}
+          </button>
+          <button className="btn" disabled={busy || loading || (!configured && !endpoint.trim())} onClick={test} style={{ flex: 1 }}>
+            {t('bark.test')}
+          </button>
+        </div>
+        {configured && (
+          <button className="btn btn-danger btn-full" disabled={busy} onClick={remove} style={{ marginTop: 12 }}>
+            {t('bark.disable')}
+          </button>
         )}
       </div>
     </div>

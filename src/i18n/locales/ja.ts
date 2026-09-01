@@ -69,6 +69,7 @@ export const ja: Record<string, string> = {
   'profile.about': 'について', 'profile.logout': 'ログアウト',  'profile.tags': 'タグ', 'profile.my_qr': 'マイQRコード', 'profile.qr_scan_hint': 'このQRコードをスキャンして友達に追加',
   'profile.notifications': '通知',
   'ntfy.title': 'ntfy プッシュ（中国Android）', 'ntfy.description': 'お使いのAndroid端末がGoogleサービスに対応していない場合（Huaweiなど）、ntfyでプッシュ通知を受信できます。', 'ntfy.step1': '1. アプリストアからntfyアプリをインストール', 'ntfy.step2': '2. ntfyアプリで＋をタップし、以下のトピックを購読：', 'ntfy.step3': '3. 下のボタンをタップして登録', 'ntfy.register': 'プッシュ登録', 'ntfy.registered': '✅ 登録済み', 'ntfy.copy_topic': 'トピックをコピー', 'ntfy.copied': 'コピーしました', 'ntfy.download_ntfy': 'ntfyアプリをダウンロード', 'ntfy.register_failed': '登録に失敗しました。もう一度お試しください',
+  'bark.title': 'Bark通知', 'bark.description': 'オフライン時、新着メッセージの通知を設定したBark URLへ送信します。本文は含まれません。', 'bark.endpoint': 'Bark URL', 'bark.endpoint_hint': 'デバイスキーを含む完全なURLを貼り付けてください。', 'bark.apns_notice': 'セルフホストでも、Bark iOSアプリは最終的にApple APNsを使用します。', 'bark.configured': 'Barkは有効です', 'bark.not_configured': 'Barkは未設定です', 'bark.saved': 'Bark設定を保存しました', 'bark.test': 'テスト送信', 'bark.test_sent': 'テスト通知を送信しました', 'bark.disable': 'Barkを無効化', 'bark.disabled': 'Barkを無効にしました', 'bark.invalid_url': '有効なHTTPまたはHTTPS URLを入力してください', 'bark.missing_key': 'Bark URLにはデバイスキーが必要です', 'bark.server_unsupported': 'このサーバーはまだBarkに対応していません。',
 
   'call.incoming': '着信', 'call.outgoing': '発信中...', 'call.connected': '通話中',
   'call.ended': '通話終了', 'call.video': 'ビデオ通話', 'call.voice': '音声通話',

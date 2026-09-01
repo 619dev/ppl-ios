@@ -235,6 +235,21 @@ export const zh: Record<string, string> = {
   'ntfy.copied': '已复制',
   'ntfy.download_ntfy': '下载 ntfy App',
   'ntfy.register_failed': '注册失败，请重试',
+  'bark.title': 'Bark 消息通知',
+  'bark.description': '离线时，PaperPhone 服务器会把新消息提醒发送到你配置的 Bark 地址。通知只包含发件人和通用提示，不包含消息正文。',
+  'bark.endpoint': 'Bark 推送地址',
+  'bark.endpoint_hint': '请粘贴 Bark App 提供的完整地址（包含设备密钥）。密钥只提交到当前 PaperPhone 服务器，不保存在本机网页存储中。',
+  'bark.apns_notice': '注意：即使使用自建 Bark 服务，Bark iOS App 最终仍通过 Apple APNs 接收通知。',
+  'bark.configured': 'Bark 已启用',
+  'bark.not_configured': 'Bark 未配置',
+  'bark.saved': 'Bark 配置已保存',
+  'bark.test': '发送测试',
+  'bark.test_sent': '测试通知已发送',
+  'bark.disable': '停用 Bark',
+  'bark.disabled': 'Bark 已停用',
+  'bark.invalid_url': '请输入有效的 HTTP 或 HTTPS 地址',
+  'bark.missing_key': 'Bark 地址必须包含设备密钥',
+  'bark.server_unsupported': '当前服务器尚未支持 Bark，请先升级服务端。',
 
 
   // Call

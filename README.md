@@ -1,26 +1,25 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.16。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.17。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.16 (51)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.17 (52)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
-## 3.0.16 更新摘要
+## 3.0.17 更新摘要
 
-- 修复已有登录会话冷启动时内嵌 Tor 未正确启动、WebSocket 持续重连的问题，并增强 Tor 控制认证的启动竞态恢复。
-- 修复文本外观密码已经解锁后，令牌刷新再次加载安全状态并清除内存密码的问题。
-- 已有会话启动时恢复本地身份密钥，并在网络恢复后校验服务端身份公钥与本地私钥是否匹配。
-- 私聊消息封装、KEM 回退、密钥结构以及实时和历史消息解密路径与同版本 Android 客户端保持一致。
-- 已在完全抹除的 iPhone 17 Pro Max 模拟器上，使用全新的 Keychain、WebView 数据和 DerivedData 验证登录、联网、双向消息解密及文件传输。
+- 新增 iOS Bark 后台消息提醒配置，可在个人信息页面保存、测试或停用 Bark 推送地址。
+- Bark 通知只包含发件人名称和通用的新消息提示，不包含消息正文；Bark 地址不会写入 WebView 本地存储。
+- 更新中、英、日、韩、法、德、俄、西八种界面语言，以及隐私政策、使用条款和通知能力说明。
+- App 与分享扩展版本统一更新为 3.0.17，iOS 构建号递增至 52。
 
 ## 隐私与网络模型
 
 PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的公开 IP 由 Tor 隐藏，Android 与 iOS 客户端均使用内嵌 Tor 访问 `.onion` 地址，不提供应用服务器的明网回退。应用每次启动都会启动 Tor，包括直接恢复已有登录会话；直连 20 秒仍未建链时，客户端会从 Tor Project Moat 获取 WebTunnel 网桥并自动切换。WebTunnel 仅用于帮助建立 Tor 线路，应用业务流量仍通过内嵌 Tor 访问 onion service。
 
-本项目完全不使用 Apple Push Notification service（APNs），不会注册 APNs 设备令牌，也不会把设备令牌或通知载荷发送给 Apple、官方中继或其他 APNs 中继。原因是 APNs 必须通过明网推送基础设施及中继交付，这会破坏 Tor-only 部署的信任和元数据边界。应用被 iOS 挂起或终止后不会收到后台远程消息通知；应用处于运行和连接状态时，可根据 WebSocket 收到的事件生成本地通知和应用内提醒。
+本应用自身不注册 Apple Push Notification service（APNs）设备令牌。iOS 用户可选择配置 Bark：PaperPhoneLite 服务器仅向 Bark 发送发件人名称和通用的新消息提示，再由 Bark App 通过 APNs 显示通知。不开启 Bark 时，应用被 iOS 挂起或终止后不会收到后台远程消息通知；应用运行并连接时仍可生成本地通知和应用内提醒。
 
-项目也不集成 FCM、Firebase、OneSignal 或 Web Push。Android 可由用户或服务器运营者选择 ntfy；ntfy 属于独立第三方服务，其隐私政策和元数据风险由所选实例决定。
+项目也不集成 FCM、Firebase、OneSignal 或 Web Push。Android 可选择 ntfy，iOS 可选择 Bark；这些独立第三方服务的隐私政策和元数据风险由所选实例决定。
 
 ## 实际功能
 
@@ -45,7 +44,7 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 | 平台/状态 | 行为 |
 |---|---|
 | iOS 应用运行且 WebSocket 已连接 | 应用内提醒；获得本地通知权限后可显示本地系统通知 |
-| iOS 应用被系统挂起或终止 | 无远程后台通知；重新打开后同步消息 |
+| iOS 应用被系统挂起或终止 | 配置 Bark 后由 Bark App 提醒；否则重新打开后同步消息 |
 | Android | 可选 ntfy，具体取决于客户端和服务器配置 |
 
 本地通知由设备根据已通过 Tor/WebSocket 收到的消息生成，不经过 APNs。主屏角标仅反映应用本地已知的未读数，不代表后台接收能力。

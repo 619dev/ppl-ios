@@ -4,6 +4,24 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.17 (iOS build 52) — 2026-09-01
+
+- Added optional Bark background-message alerts for iOS, with configuration, status, testing, and removal controls on the Profile page.
+- Validates Bark endpoints before submission and keeps device keys out of WebView storage; the selected PaperPhoneLite server stores the endpoint.
+- Limits Bark notification payloads to the sender name and a generic new-message alert, without message content.
+- Added Bark UI strings across Chinese, English, Japanese, Korean, French, German, Russian, and Spanish.
+- Updated the privacy policy, terms of use, and bilingual project documentation to describe Bark, APNs involvement, metadata exposure, and suspended-app behavior.
+- Updated the application and Share Extension versions to 3.0.17 and incremented the iOS build number to 52.
+
+- iOS 新增可选的 Bark 后台消息提醒，可在个人信息页面查看状态、配置、测试和停用。
+- Bark 地址提交前会进行校验，设备密钥不会保存在 WebView 存储中；地址由当前选择的 PaperPhoneLite 服务器保存。
+- Bark 通知仅包含发件人名称和通用的新消息提示，不包含消息正文。
+- 为中文、英文、日文、韩文、法文、德文、俄文和西班牙文补充 Bark 界面文案。
+- 更新隐私政策、使用条款和中英文项目文档，说明 Bark、APNs 参与、元数据风险及应用挂起后的通知行为。
+- App 与分享扩展版本统一更新为 3.0.17，iOS 构建号递增至 52。
+
+---
+
 ## 3.0.16 (iOS build 51) — 2026-08-21
 
 - Fixed native Tor startup for persisted signed-in sessions so cold launches no longer remain stuck in WebSocket reconnection.
