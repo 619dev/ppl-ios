@@ -86,11 +86,8 @@ async function ensureIdentityKeysOnce(accountId: string): Promise<KeyBundle> {
   // best-effort here: an expired/offline session must not permanently lock the
   // app before its normal auth refresh and retry paths can run.
   await setKeys(keys, accountId)
-  try {
-    await publishIdentityKeys(keys)
-    console.log('[Identity] New identity keys generated, sender keys reset')
-  } catch (error) {
-    console.warn('[Identity] Identity created locally; server sync will be retried after login:', error)
-  }
+  void publishIdentityKeys(keys)
+    .then(() => console.log('[Identity] New identity keys generated, sender keys reset'))
+    .catch(error => console.warn('[Identity] Identity created locally; server sync will be retried after login:', error))
   return keys
 }
