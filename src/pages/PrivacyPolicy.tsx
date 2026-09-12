@@ -54,8 +54,8 @@ export default function PrivacyPolicy() {
 
         <Section icon={<Server size={20} />} title={zh ? '4. 文件与数据存储' : '4. Files and Data Storage'}>
           <p>{zh
-            ? '上传的图片、视频、语音和文档保存在您选择服务器的持久卷中，由 Rust 服务端传输，单文件上限为 500MB；本项目不使用 Cloudflare R2。客户端在 localStorage、IndexedDB 和 Cache Storage 中保存登录状态、设置、联系人、群组、消息及媒体缓存；iOS 身份私钥保存在 Keychain 中。服务器运营者负责存储位置、备份、访问控制和保留期限。'
-            : 'Uploaded images, video, voice, and documents remain on the selected server’s persistent volume and are transferred by the Rust server, with a 500MB per-file limit; the project does not use Cloudflare R2. The client stores login state, settings, contacts, groups, messages, and media cache in localStorage, IndexedDB, and Cache Storage; iOS identity private keys are stored in Keychain. The server operator is responsible for storage location, backups, access control, and retention.'}</p>
+            ? '上传的图片、视频、语音和文档保存在您选择服务器的持久卷中，由 Rust 服务端传输，单文件上限为 500MB；用户头像和群头像标记为永久文件，普通聊天附件标记为临时文件，实际清理和保留策略由服务端决定。本项目不使用 Cloudflare R2。客户端在 localStorage、IndexedDB 和 Cache Storage 中保存登录状态、设置、联系人、群组、消息及媒体缓存；iOS 身份私钥保存在 Keychain 中。服务器运营者负责存储位置、备份、访问控制和保留期限。'
+            : 'Uploaded images, video, voice, and documents remain on the selected server’s persistent volume and are transferred by the Rust server, with a 500MB per-file limit. User and group avatars are marked as permanent files, while ordinary chat attachments are marked as temporary; actual cleanup and retention are controlled by the server. The project does not use Cloudflare R2. The client stores login state, settings, contacts, groups, messages, and media cache in localStorage, IndexedDB, and Cache Storage; iOS identity private keys are stored in Keychain. The server operator is responsible for storage location, backups, access control, and retention.'}</p>
         </Section>
 
         <Section icon={<Network size={20} />} title={zh ? '5. Tor 网络' : '5. Tor Network'}>

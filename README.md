@@ -1,17 +1,17 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.17。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.21。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.17 (52)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.21 (54)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
-## 3.0.17 更新摘要
+## 3.0.21 更新摘要
 
-- 新增 iOS Bark 后台消息提醒配置，可在个人信息页面保存、测试或停用 Bark 推送地址。
-- Bark 通知只包含发件人名称和通用的新消息提示，不包含消息正文；Bark 地址不会写入 WebView 本地存储。
-- 更新中、英、日、韩、法、德、俄、西八种界面语言，以及隐私政策、使用条款和通知能力说明。
-- App 与分享扩展版本统一更新为 3.0.17，iOS 构建号递增至 52。
+- 同步 PaperPhoneLite Web 前端 3.0.21 的文件存储更新，同时保留 iOS 的 Tor、Keychain、Bark、本地通知和分享扩展适配。
+- API 响应中的好友头像、群头像及群聊成员头像相对路径会自动补全为当前 PaperPhoneLite 服务器地址，避免错误解析到 WebView 或前端宿主。
+- 用户头像和群头像按永久文件上传；普通聊天附件继续使用临时存储类别，以配合服务端的文件生命周期管理。
+- App、分享扩展、网络请求标识及个人信息页面底部版本统一更新为 3.0.21，iOS 构建号更新为 54。
 
 ## 隐私与网络模型
 
@@ -90,7 +90,7 @@ App Store 发行包使用 Bundle ID `com.fm619tech.paperphonelite`；分享扩�
 
 ## 数据与自托管责任
 
-账号及路由元数据、加密消息和附件由用户选择的 PaperPhoneLite 服务器处理。服务器运营者负责 onion service、数据存储、备份、保留期限、访问控制、适用法律和可选 ntfy 配置。项目不运营统一消息服务，也不提供官方 APNs 中继。
+账号及路由元数据、加密消息和附件由用户选择的 PaperPhoneLite 服务器处理。用户头像和群头像使用永久存储类别，普通聊天附件使用临时存储类别；实际清理和保留策略由服务端决定。服务器运营者负责 onion service、数据存储、备份、保留期限、访问控制、适用法律和可选 ntfy 配置。项目不运营统一消息服务，也不提供官方 APNs 中继。
 
 应用内完整说明见“隐私政策”和“使用条款”。
 

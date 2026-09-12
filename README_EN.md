@@ -1,17 +1,17 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.17.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.21.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.17 (52)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.21 (54)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.0.17 release highlights
+## 3.0.21 release highlights
 
-- Added optional Bark background-message alerts for iOS, configurable, testable, and removable from the Profile page.
-- Bark alerts contain only the sender name and a generic new-message notice, never message content; Bark endpoints are not stored in WebView storage.
-- Updated all eight UI languages together with the privacy policy, terms of use, and notification documentation.
-- Updated the app and Share Extension to 3.0.17 and incremented the iOS build number to 52.
+- Synchronized the PaperPhoneLite 3.0.21 web frontend file-storage updates while retaining the iOS Tor, Keychain, Bark, local-notification, and Share Extension adaptations.
+- Relative friend, group, and group-message avatar paths returned by the API are now resolved against the configured PaperPhoneLite server instead of the WebView or frontend host.
+- User and group avatars are uploaded as permanent files; ordinary chat attachments continue to use the temporary storage class for server-managed lifecycle handling.
+- Updated the app, Share Extension, network user agent, and Profile-page footer to 3.0.21, with iOS build number 54.
 
 ## Privacy and network model
 
@@ -90,7 +90,7 @@ Attachment downloads accept only same-origin `/api/files/` URLs from the current
 
 ## Data and self-hosting responsibility
 
-Account and routing metadata, encrypted messages, and attachments are handled by the PaperPhoneLite server selected by the user. Its operator is responsible for the onion service, storage, backups, retention, access control, applicable law, and optional ntfy configuration. The project operates no unified messaging service and provides no official APNs relay.
+Account and routing metadata, encrypted messages, and attachments are handled by the PaperPhoneLite server selected by the user. User and group avatars use the permanent storage class, while ordinary chat attachments use the temporary storage class; actual cleanup and retention are controlled by the server. Its operator is responsible for the onion service, storage, backups, retention, access control, applicable law, and optional ntfy configuration. The project operates no unified messaging service and provides no official APNs relay.
 
 See the in-app Privacy Policy and Terms of Use for the complete disclosures.
 

@@ -4,6 +4,22 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.21 (iOS build 54) — 2026-09-12
+
+- Synchronized the managed file-storage changes from the PaperPhoneLite 3.0.21 web frontend while preserving the iOS Tor, Keychain, Bark, local-notification, Share Extension, and iPad adaptations.
+- Normalized nested `avatar` and `from_avatar` fields in API responses so relative friend, group, and group-message avatar paths resolve against the configured PaperPhoneLite server.
+- Added an explicit storage class to file uploads. User and group avatars now use permanent storage, while ordinary chat attachments remain temporary.
+- Added a rendering-side normalization safeguard for group-message sender avatars.
+- Updated the app, Share Extension, network user agent, package metadata, and Profile-page footer to 3.0.21; incremented the iOS build number to 54.
+
+- 同步 PaperPhoneLite Web 前端 3.0.21 的托管文件存储更新，同时保留 iOS 的 Tor、Keychain、Bark、本地通知、分享扩展和 iPad 适配。
+- 递归规范化 API 响应中的 `avatar` 与 `from_avatar` 字段，使好友头像、群头像和群聊成员头像的相对路径始终基于当前配置的 PaperPhoneLite 服务器解析。
+- 文件上传新增明确的存储类别：用户头像和群头像改用永久存储，普通聊天附件继续使用临时存储。
+- 群聊消息发送者头像在渲染时增加路径规范化兜底。
+- App、分享扩展、网络请求标识、软件包元数据及个人信息页面底部版本统一更新为 3.0.21，iOS 构建号更新为 54。
+
+---
+
 ## 3.0.17 (iOS build 52) — 2026-09-01
 
 - Added optional Bark background-message alerts for iOS, with configuration, status, testing, and removal controls on the Profile page.

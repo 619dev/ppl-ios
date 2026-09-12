@@ -261,7 +261,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
         request.timeoutInterval = 15
         request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("PaperPhoneLite/3.0.17 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("PaperPhoneLite/3.0.21 (iOS)", forHTTPHeaderField: "User-Agent")
         request.httpBody = Data(#"{"country":"cn","transports":["webtunnel"]}"#.utf8)
         let config = URLSessionConfiguration.ephemeral
         config.waitsForConnectivity = false

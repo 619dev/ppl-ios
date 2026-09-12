@@ -16,7 +16,7 @@ import { deleteBarkEndpoint, getBarkStatus, normalizeBarkEndpoint, saveBarkEndpo
 import { getPlatform } from '../utils/platform'
 
 type SubView = null | 'password' | 'avatar' | '2fa' | 'sessions' | 'language' | 'fingerprint' | 'myqr' | 'proxy' | 'message-privacy' | 'bark'
-const APP_VERSION = '3.0.17'
+const APP_VERSION = '3.0.21'
 
 export default function Profile() {
   const { t } = useI18n()
@@ -616,7 +616,7 @@ function ChangeAvatar({ onBack, t, user, setAuth }: { onBack: () => void; t: (k:
     setUploading(true)
     try {
       // Upload file
-      const res = await uploadFile(file)
+      const res = await uploadFile(file, 'permanent')
       // Update avatar
       await put('/api/users/avatar', { avatar: res.url })
       setPreview(res.url)
