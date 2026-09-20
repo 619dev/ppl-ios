@@ -4,6 +4,22 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.0.22 (iOS build 55) — 2026-09-20
+
+- Fixed the iOS Bark settings page so a slow status request no longer leaves the Save action unavailable.
+- Prevented stale Bark status responses from overwriting a newly saved configuration or updating the page after it has been closed.
+- Made the Bark save and test controls explicit non-submit buttons to avoid default iOS WebView form behavior.
+- Standardized the full PaperPhoneLite product name in Bark guidance across Chinese, English, Japanese, Korean, French, German, Russian, and Spanish.
+- Updated the app, Share Extension, network user agent, package metadata, and Profile-page footer to 3.0.22; incremented the iOS build number to 55.
+
+- 修复 iOS Bark 设置页因状态查询长时间未返回而导致保存按钮无法使用的问题。
+- 修复旧的 Bark 状态响应覆盖刚保存配置或在页面关闭后继续回写状态的问题。
+- Bark 保存和测试按钮明确使用普通按钮行为，避免 iOS WebView 默认表单行为干扰。
+- 中文、英文、日文、韩文、法文、德文、俄文和西班牙文的 Bark 说明统一使用完整产品名 PaperPhoneLite。
+- App、分享扩展、网络请求标识、软件包元数据及个人信息页面底部版本统一更新为 3.0.22，iOS 构建号更新为 55。
+
+---
+
 ## 3.0.21 (iOS build 54) — 2026-09-12
 
 - Synchronized the managed file-storage changes from the PaperPhoneLite 3.0.21 web frontend while preserving the iOS Tor, Keychain, Bark, local-notification, Share Extension, and iPad adaptations.

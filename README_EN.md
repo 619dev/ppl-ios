@@ -1,17 +1,18 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.21.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.22.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.21 (54)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.0.22 (55)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.0.21 release highlights
+## 3.0.22 release highlights
 
-- Synchronized the PaperPhoneLite 3.0.21 web frontend file-storage updates while retaining the iOS Tor, Keychain, Bark, local-notification, and Share Extension adaptations.
-- Relative friend, group, and group-message avatar paths returned by the API are now resolved against the configured PaperPhoneLite server instead of the WebView or frontend host.
-- User and group avatars are uploaded as permanent files; ordinary chat attachments continue to use the temporary storage class for server-managed lifecycle handling.
-- Updated the app, Share Extension, network user agent, and Profile-page footer to 3.0.21, with iOS build number 54.
+- Fixed the iOS Bark settings page so a slow status request no longer leaves the Save action unavailable.
+- Prevented an older Bark status response from overwriting a newly saved configuration as “not configured.”
+- Made the Bark save and test controls explicit non-submit buttons to avoid default iOS WebView form behavior.
+- Standardized the full PaperPhoneLite product name in Bark guidance across Chinese, English, Japanese, Korean, French, German, Russian, and Spanish.
+- Updated the app, Share Extension, network user agent, package metadata, and Profile-page footer to 3.0.22, with iOS build number 55.
 
 ## Privacy and network model
 

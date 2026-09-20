@@ -16,7 +16,7 @@ import { deleteBarkEndpoint, getBarkStatus, normalizeBarkEndpoint, saveBarkEndpo
 import { getPlatform } from '../utils/platform'
 
 type SubView = null | 'password' | 'avatar' | '2fa' | 'sessions' | 'language' | 'fingerprint' | 'myqr' | 'proxy' | 'message-privacy' | 'bark'
-const APP_VERSION = '3.0.21'
+const APP_VERSION = '3.0.22'
 
 export default function Profile() {
   const { t } = useI18n()
@@ -378,18 +378,28 @@ function BarkSettings({ onBack, t }: { onBack: () => void; t: (k: string) => str
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const mutationVersion = useRef(0)
 
   useEffect(() => {
+    let active = true
+    const version = mutationVersion.current
     getBarkStatus()
       .then(status => {
+        if (!active || mutationVersion.current !== version) return
         setConfigured(status.configured)
         setEndpointHint(status.endpoint_hint || '')
       })
-      .catch(() => setError(t('bark.server_unsupported')))
-      .finally(() => setLoading(false))
+      .catch(() => {
+        if (active && mutationVersion.current === version) setError(t('bark.server_unsupported'))
+      })
+      .finally(() => {
+        if (active) setLoading(false)
+      })
+    return () => { active = false }
   }, [])
 
   const run = async (action: () => Promise<void>, success: string) => {
+    mutationVersion.current += 1
     setBusy(true)
     setError('')
     setMessage('')
@@ -461,10 +471,13 @@ function BarkSettings({ onBack, t }: { onBack: () => void; t: (k: string) => str
         {message && <div style={{ color: 'var(--success)', fontSize: 13, marginTop: 12 }}>{message}</div>}
 
         <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-          <button className="btn btn-primary" disabled={busy || loading || !endpoint.trim()} onClick={save} style={{ flex: 1 }}>
+          {/* A status request can take a long time over Tor on iOS. Saving a
+              newly entered endpoint does not depend on that request, so do not
+              leave the primary action disabled while it is in flight. */}
+          <button type="button" className="btn btn-primary" disabled={busy || !endpoint.trim()} onClick={save} style={{ flex: 1 }}>
             {busy ? t('common.loading') : t('common.save')}
           </button>
-          <button className="btn" disabled={busy || loading || (!configured && !endpoint.trim())} onClick={test} style={{ flex: 1 }}>
+          <button type="button" className="btn" disabled={busy || (!endpoint.trim() && (loading || !configured))} onClick={test} style={{ flex: 1 }}>
             {t('bark.test')}
           </button>
         </div>

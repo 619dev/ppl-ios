@@ -1,17 +1,18 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.21。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.22。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.21 (54)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.0.22 (55)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
-## 3.0.21 更新摘要
+## 3.0.22 更新摘要
 
-- 同步 PaperPhoneLite Web 前端 3.0.21 的文件存储更新，同时保留 iOS 的 Tor、Keychain、Bark、本地通知和分享扩展适配。
-- API 响应中的好友头像、群头像及群聊成员头像相对路径会自动补全为当前 PaperPhoneLite 服务器地址，避免错误解析到 WebView 或前端宿主。
-- 用户头像和群头像按永久文件上传；普通聊天附件继续使用临时存储类别，以配合服务端的文件生命周期管理。
-- App、分享扩展、网络请求标识及个人信息页面底部版本统一更新为 3.0.21，iOS 构建号更新为 54。
+- 修复 iOS Bark 设置页因状态查询长时间未返回而导致保存按钮无法使用的问题。
+- 修复 Bark 保存完成后，较早的状态查询晚到并把界面错误覆盖为“未配置”的竞态。
+- Bark 保存和测试按钮明确使用普通按钮行为，避免 iOS WebView 默认表单行为干扰。
+- 中文、英文、日文、韩文、法文、德文、俄文和西班牙文的 Bark 说明统一使用完整产品名 PaperPhoneLite。
+- App、分享扩展、网络请求标识、软件包元数据及个人信息页面底部版本统一更新为 3.0.22，iOS 构建号更新为 55。
 
 ## 隐私与网络模型
 
