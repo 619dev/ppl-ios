@@ -4,6 +4,15 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.1.1 (iOS build 57) — 2026-10-17
+
+- Removed the unused proxy settings entry and subpage from Profile.
+- Updated the app, Share Extension, Profile footer, network user agent, and package metadata to 3.1.1 (57).
+- 移除个人信息页已无用途的代理设置入口与子页面。
+- App、分享扩展、个人信息页底部、网络请求标识及软件包版本统一更新为 3.1.1（57）。
+
+---
+
 ## 3.1.0 (iOS build 56) — 2026-10-17
 
 - Updated all maintained guides and in-app disclosures for identity verification, server compatibility, and the actual signing/encryption path; corrected the Node.js requirement to 22+.

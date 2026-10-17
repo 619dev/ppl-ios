@@ -1,6 +1,6 @@
 # CapApp-SPM
 
-PaperPhoneLite iOS 3.1.0 (56) uses this package to connect Capacitor 8 and its native plugins through Swift Package Manager. The minimum deployment target is iOS 17.
+PaperPhoneLite iOS 3.1.1 (57) uses this package to connect Capacitor 8 and its native plugins through Swift Package Manager. The minimum deployment target is iOS 17.
 
 `Package.swift` and the package wiring are managed by the Capacitor CLI. Change plugin dependencies in the root `package.json`, install them, then run these commands from the repository root:
 

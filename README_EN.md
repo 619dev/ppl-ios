@@ -1,18 +1,19 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.1.0.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.1.1.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.1.0 (56)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.1.1 (57)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.1.0 release highlights
+## 3.1.1 release highlights
 
+- Removed the unused proxy settings entry and subpage from Profile.
 - Synchronized upstream `9bf6aaf` (3.1.0), adding signed private messages, contact identity verification, and identity-change notices.
 - Added signed groups, trusted-member checks, sender-key rotation, and offline history recovery across key epochs.
 - Improved paginated message sync, cache-before-cursor persistence, and account isolation.
 - Added security text in eight languages and the upstream security regression tests.
-- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.0 (56).
+- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.1 (57).
 
 ## Privacy and network model
 
@@ -111,7 +112,7 @@ xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
   -derivedDataPath /tmp/ppl-ios-derived CODE_SIGNING_ALLOWED=NO build
 ```
 
-See [test coverage and limitations](tests/README.md). This 3.1.0 update passed the frontend build, security regressions, checks for 92 security text keys across eight languages, and unsigned device-target compilation of the app and Share Extension. Unsigned output is not a distribution build; live device interoperability remains untested. Simulator validation was blocked by a local CoreSimulator/Xcode mismatch that requires fixing the development environment.
+See [test coverage and limitations](tests/README.md). This 3.1.0 update passed the frontend build, security regressions, checks for 92 security text keys across eight languages, and unsigned device-target compilation of the app and Share Extension. Unsigned output is not a distribution build; live device interoperability remains untested. A subsequent simulator build with `CODE_SIGNING_ALLOWED=YES` succeeded and the app was launched.
 
 Capacitor plugins use Swift Package Manager; Tor and IPtProxy use CocoaPods. Keep both dependency systems and build the workspace. After frontend changes, rebuild and run `cap sync ios` to update bundled native resources.
 
