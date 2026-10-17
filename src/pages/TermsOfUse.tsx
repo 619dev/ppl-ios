@@ -19,7 +19,7 @@ export default function TermsOfUse() {
           <Shield size={36} /><h2>PaperPhoneLite</h2>
           <p>{zh ? '轻量级、Tor-only 的端到端加密通讯工具' : 'Lightweight, Tor-only, end-to-end encrypted messaging'}</p>
         </div>
-        <div className="privacy-updated">{zh ? '生效及更新日期：2026年8月18日' : 'Effective and updated: August 18, 2026'}</div>
+        <div className="privacy-updated">{zh ? '生效及更新日期：2026年10月17日' : 'Effective and updated: October 17, 2026'}</div>
 
         <Section icon={<FileText size={20} />} title={zh ? '1. 条款适用与接受' : '1. Acceptance and Scope'}>
           <p>{zh
@@ -35,8 +35,8 @@ export default function TermsOfUse() {
 
         <Section icon={<Lock size={20} />} title={zh ? '3. 账号、密钥与安全责任' : '3. Accounts, Keys, and Security'}>
           <p>{zh
-            ? '您应保护密码、两步验证恢复码、设备和本地加密密钥。丢失密钥、额外消息密码或恢复码可能导致数据无法解密或账号无法恢复。请在首次敏感通信前核对安全号码。端到端加密降低内容暴露风险，但不能防止设备被控制、截图、收件人转发、恶意服务器元数据分析或错误配置。Tor 可隐藏网络来源，但不保证绝对匿名。'
-            : 'You are responsible for safeguarding passwords, two-factor recovery codes, devices, and local encryption keys. Losing keys, an extra message password, or recovery codes may make data or an account unrecoverable. Verify safety numbers before sensitive communication. End-to-end encryption reduces content exposure but cannot prevent device compromise, screenshots, recipient forwarding, malicious-server metadata analysis, or misconfiguration. Tor conceals network origin but does not guarantee absolute anonymity.'}</p>
+            ? '您应保护密码、两步验证恢复码、设备和本地加密密钥。丢失密钥、额外消息密码或恢复码可能导致数据无法解密或账号无法恢复。请在首次敏感通信前核对安全号码，并使用线下约定的文本外观密码完成双方身份验证及签名回执；不要在线发送该密码，身份密钥变化后需要重新验证。端到端加密降低内容暴露风险，但不能防止设备被控制、截图、收件人转发、恶意服务器元数据分析或错误配置。Tor 可隐藏网络来源，但不保证绝对匿名。'
+            : 'You are responsible for safeguarding passwords, two-factor recovery codes, devices, and local encryption keys. Losing keys, an extra message password, or recovery codes may make data or an account unrecoverable. Before sensitive communication, compare safety numbers and complete mutual identity verification and signed receipts using a text-appearance password agreed offline. Do not send that password online; verify again after identity-key changes. End-to-end encryption reduces content exposure but cannot prevent device compromise, screenshots, recipient forwarding, malicious-server metadata analysis, or misconfiguration. Tor conceals network origin but does not guarantee absolute anonymity.'}</p>
         </Section>
 
         <Section icon={<UserX size={20} />} title={zh ? '4. 可接受使用' : '4. Acceptable Use'}>

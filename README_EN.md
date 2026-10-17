@@ -1,18 +1,18 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.0.22.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.1.0.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.0.22 (55)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.1.0 (56)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.0.22 release highlights
+## 3.1.0 release highlights
 
-- Fixed the iOS Bark settings page so a slow status request no longer leaves the Save action unavailable.
-- Prevented an older Bark status response from overwriting a newly saved configuration as “not configured.”
-- Made the Bark save and test controls explicit non-submit buttons to avoid default iOS WebView form behavior.
-- Standardized the full PaperPhoneLite product name in Bark guidance across Chinese, English, Japanese, Korean, French, German, Russian, and Spanish.
-- Updated the app, Share Extension, network user agent, package metadata, and Profile-page footer to 3.0.22, with iOS build number 55.
+- Synchronized upstream `9bf6aaf` (3.1.0), adding signed private messages, contact identity verification, and identity-change notices.
+- Added signed groups, trusted-member checks, sender-key rotation, and offline history recovery across key epochs.
+- Improved paginated message sync, cache-before-cursor persistence, and account isolation.
+- Added security text in eight languages and the upstream security regression tests.
+- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.0 (56).
 
 ## Privacy and network model
 
@@ -27,8 +27,8 @@ The project also integrates no FCM, Firebase, OneSignal, or Web Push. Android ma
 - Private and group chats, contacts, and group management
 - Text, image, video, voice, file, emoji, and sticker messages
 - Authenticated attachment downloads through the configured PaperPhoneLite server, with the iOS share sheet for saving or forwarding files
-- Hybrid X25519 and ML-KEM-768 key agreement with XSalsa20-Poly1305 message encryption
-- Sender Keys for encrypted groups and safety-number verification
+- X25519 key agreement, XSalsa20-Poly1305 message encryption, and Ed25519 message signatures
+- Signed group Sender Keys, member identity checks, and key rotation
 - Optional extra message password with eight ciphertext text appearances
 - Message synchronization, offline cache, expiration, and cache clearing
 - QR features, TOTP two-factor authentication, recovery codes, and device sessions
@@ -56,6 +56,14 @@ End-to-end encryption protects message content but does not hide operational met
 
 The optional extra message password is never uploaded or automatically synchronized. It remains in process memory only while unlocked; the device stores salt and verification data. This is an additional layer above normal E2EE, not a substitute for device security, strong passwords, or secure system storage.
 
+## Identity verification and compatibility
+
+Both participants enable and unlock the same text-appearance password agreed offline in Message Privacy, then verify identity from the contact profile. The protocol verification text is always `paperphone.app`; a green check appears after mutual verification and signed receipts complete. Do not send this password through chat or another online channel. Identity-key changes require verification again; compare safety numbers through an independent channel too.
+
+Signed private messages in 3.1.0 use X25519, XSalsa20-Poly1305, and Ed25519. The code retains ML-KEM protocol support, but the current sending path does not enable ML-KEM and does not establish post-quantum protection for current messages. Group key distributions and new messages bind member identities, the group, and the key epoch. Unsigned historical messages are not verified messages.
+
+Use servers and peers supporting the 3.1.0 signature protocol and group key-epoch APIs. Older clients may not process new signed messages; coordinate server and peer upgrades. The upstream baseline is `9bf6aaf` (2026-10-17).
+
 ## Technology
 
 - React 19, TypeScript 5.7, Vite 6, and Zustand
@@ -70,15 +78,15 @@ The project does not depend on `@capacitor/push-notifications`.
 
 ## Build
 
-Requirements: Node.js 18+, npm 9+, CocoaPods, Xcode 26+, and macOS.
+Requirements: Node.js 22+, npm 9+, CocoaPods, Xcode 26+, and macOS.
 
 ```bash
 git clone https://github.com/619dev/ppl-ios
 cd ppl-ios
-npm install
+npm ci
 npm run build
 npx cap sync ios
-cd ios/App && pod install
+(cd ios/App && pod install)
 ```
 
 Open `ios/App/App.xcworkspace` in Xcode (not the `.xcodeproj`), configure your own signing, and run. Never commit `.p8`, `.mobileprovision`, IPA, or other signing material to the source repository.
@@ -88,6 +96,24 @@ Command-line builds must also target `ios/App/App.xcworkspace`. Building the `.x
 The App Store build uses `com.fm619tech.paperphonelite`; its Share Extension uses `com.fm619tech.paperphonelite.share`. Archiving and upload require the distributor's Apple Distribution certificate, matching App Store provisioning profiles, and App Store Connect access.
 
 Attachment downloads accept only same-origin `/api/files/` URLs from the currently configured server and include the active login token. If that token has expired, the client refreshes the session and retries. This prevents attachment actions from handing onion URLs to the system browser or downloading unexpected cross-origin content.
+
+## Validation and development
+
+Run from the repository root:
+
+```bash
+npm run test:security
+npm run test:i18n
+npm run build
+npx cap sync ios
+xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
+  -configuration Debug -sdk iphoneos -destination 'generic/platform=iOS' \
+  -derivedDataPath /tmp/ppl-ios-derived CODE_SIGNING_ALLOWED=NO build
+```
+
+See [test coverage and limitations](tests/README.md). This 3.1.0 update passed the frontend build, security regressions, checks for 92 security text keys across eight languages, and unsigned device-target compilation of the app and Share Extension. Unsigned output is not a distribution build; live device interoperability remains untested. Simulator validation was blocked by a local CoreSimulator/Xcode mismatch that requires fixing the development environment.
+
+Capacitor plugins use Swift Package Manager; Tor and IPtProxy use CocoaPods. Keep both dependency systems and build the workspace. After frontend changes, rebuild and run `cap sync ios` to update bundled native resources.
 
 ## Data and self-hosting responsibility
 

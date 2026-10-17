@@ -4,6 +4,27 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.1.0 (iOS build 56) — 2026-10-17
+
+- Updated all maintained guides and in-app disclosures for identity verification, server compatibility, and the actual signing/encryption path; corrected the Node.js requirement to 22+.
+- Documented successful frontend/security/localization checks and unsigned iOS compilation, plus pending live-device testing and the local simulator mismatch.
+- 更新全部维护中的说明及应用内声明，补充身份验证、服务端兼容和实际签名加密路径，将 Node.js 要求更正为 22+。
+- 记录前端、安全、翻译及无签名 iOS 编译验证结果，并说明真机联调待完成及本机模拟器不匹配问题。
+
+- Synchronized upstream `9bf6aaf` (3.1.0), adding signed private messages, contact identity verification, and identity-change notices.
+- Added signed groups, trusted-member checks, sender-key rotation, and offline history recovery across key epochs.
+- Improved paginated message sync, cache-before-cursor persistence, and account isolation.
+- Added security text in eight languages and the upstream security regression tests.
+- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.0 (56).
+
+- 同步上游 `9bf6aaf`（3.1.0），加入私聊消息签名、联系人身份验证与身份变化提示。
+- 加入群组签名、可信成员校验、发送密钥轮换及多密钥时期的离线历史恢复。
+- 完善消息分页同步、缓存落盘后推进游标及跨账号任务隔离。
+- 补充八种语言的安全提示和上游安全回归测试。
+- 保留 iOS Tor、Keychain、Bark、本地通知、分享扩展与 iPad 适配；版本更新为 3.1.0（56）。
+
+---
+
 ## 3.0.22 (iOS build 55) — 2026-09-20
 
 - Fixed the iOS Bark settings page so a slow status request no longer leaves the Save action unavailable.

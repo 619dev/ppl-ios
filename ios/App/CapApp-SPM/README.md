@@ -1,5 +1,14 @@
 # CapApp-SPM
 
-This package is used to host SPM dependencies for your Capacitor project
+PaperPhoneLite iOS 3.1.0 (56) uses this package to connect Capacitor 8 and its native plugins through Swift Package Manager. The minimum deployment target is iOS 17.
 
-Do not modify the contents of it or there may be unintended consequences.
+`Package.swift` and the package wiring are managed by the Capacitor CLI. Change plugin dependencies in the root `package.json`, install them, then run these commands from the repository root:
+
+```bash
+npm run build
+npx cap sync ios
+```
+
+Do not hand-edit generated package dependencies. Tor and IPtProxy remain CocoaPods dependencies in `../Podfile`; this package does not replace them. Run `(cd ios/App && pod install)` from the repository root when setting up CocoaPods, then open or build `ios/App/App.xcworkspace`.
+
+See the root [English README](../../../README_EN.md) or [中文说明](../../../README.md) for setup, unsigned build commands, signing and validation limits.

@@ -20,7 +20,7 @@ export default function PrivacyPolicy() {
           <h2 className="privacy-hero-title">PaperPhoneLite</h2>
           <p className="privacy-hero-subtitle">{zh ? '隐私声明' : 'Privacy Policy'}</p>
         </div>
-        <div className="privacy-updated">{zh ? '生效及更新日期：2026年8月18日' : 'Effective and updated: August 18, 2026'}</div>
+        <div className="privacy-updated">{zh ? '生效及更新日期：2026年10月17日' : 'Effective and updated: October 17, 2026'}</div>
 
         <Section icon={<Eye size={20} />} title={zh ? '1. 适用范围与责任主体' : '1. Scope and Data Controller'}>
           <p>{zh
@@ -45,8 +45,8 @@ export default function PrivacyPolicy() {
 
         <Section icon={<Lock size={20} />} title={zh ? '3. 消息加密与限制' : '3. Message Encryption and Limits'}>
           <p>{zh
-            ? '私聊使用 X25519 与 ML-KEM-768 混合密钥协商并以 XSalsa20-Poly1305 加密；加密群聊使用 Sender Key。身份私钥和 Sender Key 保存在本地设备，服务器存储并转发密文。可选的“消息隐私”密码在端到端加密前增加一层本地加密，密码不会上传或自动同步。'
-            : 'Private chats use hybrid X25519 and ML-KEM-768 key agreement with XSalsa20-Poly1305 encryption; encrypted groups use Sender Keys. Identity private keys and Sender Keys stay on local devices while the server stores and relays ciphertext. The optional “message privacy” password adds local encryption before normal end-to-end encryption and is never uploaded or automatically synchronized.'}</p>
+            ? '3.1.0 私聊使用 X25519 密钥协商、XSalsa20-Poly1305 加密与 Ed25519 签名；签名群聊使用 Sender Key 并按成员变化轮换密钥。当前发送路径未启用 ML-KEM。身份私钥和 Sender Key 保存在本地设备，服务器存储并转发密文。可选的“消息隐私”密码在端到端加密前增加一层本地加密，密码不会上传或自动同步。'
+            : 'In 3.1.0, private chats use X25519 key agreement, XSalsa20-Poly1305 encryption, and Ed25519 signatures; signed groups use Sender Keys rotated with membership changes. The current sending path does not enable ML-KEM. Identity private keys and Sender Keys stay on local devices while the server stores and relays ciphertext. The optional “message privacy” password adds local encryption before normal end-to-end encryption and is never uploaded or automatically synchronized.'}</p>
           <p>{zh
             ? '端到端加密不隐藏账号关系、群成员、时间、消息类型、大小和投递状态等运行所需元数据，也不能保护已被控制的设备、截图、收件人保存或转发的内容。安全号码应由通信双方独立核对。'
             : 'End-to-end encryption does not conceal operational metadata such as account relationships, group membership, time, message type, size, or delivery status, and cannot protect a compromised device, screenshots, or content saved or forwarded by a recipient. Participants should independently verify safety numbers.'}</p>

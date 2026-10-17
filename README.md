@@ -1,18 +1,18 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.0.22。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.1.0。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.0.22 (55)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.1.0 (56)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
-## 3.0.22 更新摘要
+## 3.1.0 更新摘要
 
-- 修复 iOS Bark 设置页因状态查询长时间未返回而导致保存按钮无法使用的问题。
-- 修复 Bark 保存完成后，较早的状态查询晚到并把界面错误覆盖为“未配置”的竞态。
-- Bark 保存和测试按钮明确使用普通按钮行为，避免 iOS WebView 默认表单行为干扰。
-- 中文、英文、日文、韩文、法文、德文、俄文和西班牙文的 Bark 说明统一使用完整产品名 PaperPhoneLite。
-- App、分享扩展、网络请求标识、软件包元数据及个人信息页面底部版本统一更新为 3.0.22，iOS 构建号更新为 55。
+- 同步上游 `9bf6aaf`（3.1.0），加入私聊消息签名、联系人身份验证与身份变化提示。
+- 加入群组签名、可信成员校验、发送密钥轮换及多密钥时期的离线历史恢复。
+- 完善消息分页同步、缓存落盘后推进游标及跨账号任务隔离。
+- 补充八种语言的安全提示和上游安全回归测试。
+- 保留 iOS Tor、Keychain、Bark、本地通知、分享扩展与 iPad 适配；版本更新为 3.1.0（56）。
 
 ## 隐私与网络模型
 
@@ -27,8 +27,8 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 - 私聊与群聊、联系人和群组管理
 - 文字、图片、视频、语音、文件、表情与贴纸消息
 - 通过当前 PaperPhoneLite 服务器鉴权下载附件，并在 iOS 系统分享面板中保存或转发文件
-- X25519 与 ML-KEM-768 混合密钥协商、XSalsa20-Poly1305 消息加密
-- 加密群聊 Sender Key、会话安全号码验证
+- X25519 密钥协商、XSalsa20-Poly1305 消息加密与 Ed25519 消息签名
+- 签名群聊 Sender Key、成员身份校验与密钥轮换
 - 可选的额外消息密码与八种密文文本外观
 - 消息同步、离线缓存、自动删除和缓存清理
 - 二维码、TOTP 两步验证、恢复码和设备会话管理
@@ -56,6 +56,14 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 
 额外消息密码不会上传或自动同步。密码只在解锁期间保留于进程内存，本地保存盐和验证数据。它是原有端到端加密之上的附加层，不能替代设备锁、强密码或系统安全存储。
 
+## 身份验证与版本兼容
+
+双方在“消息隐私”中启用并解锁线下约定的同一文本外观密码，再从联系人资料页进行身份验证。协议验证文本固定为 `paperphone.app`；双方验证与签名回执完成后显示绿色对勾。不要通过聊天或其他线上渠道发送这个密码。身份密钥变化后需要重新验证；安全号码也应通过独立渠道核对。
+
+3.1.0 的签名私聊使用 X25519、XSalsa20-Poly1305 与 Ed25519。代码保留 ML-KEM 协议支持，但当前发送路径未启用 ML-KEM，不能据此宣称当前消息具备后量子保护。群组密钥分发和新消息绑定成员身份、群组及密钥时期；历史无签名消息不等同于已验证消息。
+
+请配套使用支持 3.1.0 签名协议与群组密钥时期接口的服务器和客户端。旧版客户端可能无法处理新的签名消息；升级前应协调服务器和通信双方。上游基线为 `9bf6aaf`（2026-10-17）。
+
 ## 技术栈
 
 - React 19、TypeScript 5.7、Vite 6、Zustand
@@ -70,15 +78,15 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 
 ## 构建
 
-要求 Node.js 18+、npm 9+、CocoaPods、Xcode 26+ 与 macOS。
+要求 Node.js 22+、npm 9+、CocoaPods、Xcode 26+ 与 macOS。
 
 ```bash
 git clone https://github.com/619dev/ppl-ios
 cd ppl-ios
-npm install
+npm ci
 npm run build
 npx cap sync ios
-cd ios/App && pod install
+(cd ios/App && pod install)
 ```
 
 随后使用 Xcode 打开 `ios/App/App.xcworkspace`（不要打开 `.xcodeproj`），配置自己的签名并运行。任何 `.p8`、`.mobileprovision`、IPA 和其他签名材料都不应提交到源码仓库。
@@ -88,6 +96,24 @@ cd ios/App && pod install
 App Store 发行包使用 Bundle ID `com.fm619tech.paperphonelite`；分享扩展使用 `com.fm619tech.paperphonelite.share`。归档和上传需要发行者自己的 Apple Distribution 证书、对应 App Store provisioning profiles，以及 App Store Connect 权限。
 
 附件下载只接受当前已配置服务器同源的 `/api/files/` 地址，并携带当前登录令牌；令牌过期时客户端会先刷新会话再重试。此限制可防止附件按钮把 onion URL 交给系统浏览器，或下载其他来源的非预期内容。
+
+## 验证与开发
+
+在仓库根目录运行：
+
+```bash
+npm run test:security
+npm run test:i18n
+npm run build
+npx cap sync ios
+xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
+  -configuration Debug -sdk iphoneos -destination 'generic/platform=iOS' \
+  -derivedDataPath /tmp/ppl-ios-derived CODE_SIGNING_ALLOWED=NO build
+```
+
+测试范围与限制见 [测试说明](tests/README.md)。本次 3.1.0 更新已通过前端构建、安全回归、92 个安全文本键的八语言检查，以及 App 和分享扩展的无签名真机目标编译。无签名编译产物不能直接用于发行；尚未完成真机联调。模拟器验证因本机 CoreSimulator 与 Xcode 不匹配未完成，需先修复本机开发环境。
+
+Capacitor 插件通过 Swift Package Manager 接入，Tor 与 IPtProxy 通过 CocoaPods 接入。必须保留两套依赖并使用 workspace 构建；修改前端后重新构建并执行 `cap sync ios`，以更新原生项目内的资源。
 
 ## 数据与自托管责任
 
