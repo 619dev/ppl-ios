@@ -37,7 +37,7 @@ export default function CallOverlay() {
       {/* Remote video (full screen) */}
       {call.callInfo?.isVideo && (
         <video ref={call.remoteVideoRef} autoPlay playsInline muted
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }} />
       )}
 
       {/* Local video (PIP) */}
@@ -105,7 +105,7 @@ export default function CallOverlay() {
 
       {/* Controls */}
       <div style={{
-        position: 'absolute', bottom: 'calc(60px + env(safe-area-inset-bottom, 0px))', left: 0, right: 0,
+        position: 'absolute', bottom: 'calc(60px + var(--safe-bottom))', left: 0, right: 0,
         display: 'flex', justifyContent: 'center', gap: 24, zIndex: 5,
       }}>
         {/* Incoming: Accept / Reject */}

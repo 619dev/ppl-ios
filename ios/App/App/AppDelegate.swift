@@ -21,6 +21,64 @@ private struct PaperPhoneRouter: Router {
 
 @objc(PaperPhoneBridgeViewController)
 public class PaperPhoneBridgeViewController: CAPBridgeViewController {
+    private var loadingObservation: NSKeyValueObservation?
+    private var lastInsets: UIEdgeInsets?
+
+    public override func viewDidLoad() {
+        super.viewDidLoad()
+        guard let webView else { return }
+
+        // Draw the web background edge to edge. HTML applies the current native
+        // safe area once to its content shell, including Duo's trailing rail.
+        let container = UIView()
+        container.backgroundColor = .systemBackground
+        webView.removeFromSuperview()
+        view = container
+        container.addSubview(webView)
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
+        container.keyboardLayoutGuide.followsUndockedKeyboard = false
+        if #available(iOS 17.0, *) {
+            container.keyboardLayoutGuide.usesBottomSafeArea = false
+        }
+        NSLayoutConstraint.activate([
+            webView.topAnchor.constraint(equalTo: container.topAnchor),
+            webView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: container.keyboardLayoutGuide.topAnchor)
+        ])
+        loadingObservation = webView.observe(\.isLoading, options: [.new]) { [weak self] webView, _ in
+            if !webView.isLoading { self?.publishInsets(force: true) }
+        }
+    }
+
+    public override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        publishInsets()
+    }
+
+    public override func viewSafeAreaInsetsDidChange() {
+        super.viewSafeAreaInsetsDidChange()
+        publishInsets()
+    }
+
+    private func publishInsets(force: Bool = false) {
+        guard let webView, webView.window != nil else { return }
+        let insets = webView.safeAreaInsets
+        guard force || lastInsets != insets else { return }
+        lastInsets = insets
+        let script = """
+        (() => {
+          const s = document.documentElement.style;
+          s.setProperty('--native-safe-top', '\(insets.top)px');
+          s.setProperty('--native-safe-right', '\(insets.right)px');
+          s.setProperty('--native-safe-bottom', '\(insets.bottom)px');
+          s.setProperty('--native-safe-left', '\(insets.left)px');
+        })();
+        """
+        webView.evaluateJavaScript(script, completionHandler: nil)
+    }
+
     public override func router() -> Router {
         PaperPhoneRouter()
     }
@@ -261,7 +319,7 @@ public class TorPlugin: CAPPlugin, CAPBridgedPlugin {
         request.timeoutInterval = 15
         request.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("PaperPhoneLite/3.1.1 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.setValue("PaperPhoneLite/3.1.2 (iOS)", forHTTPHeaderField: "User-Agent")
         request.httpBody = Data(#"{"country":"cn","transports":["webtunnel"]}"#.utf8)
         let config = URLSessionConfiguration.ephemeral
         config.waitsForConnectivity = false
@@ -553,6 +611,47 @@ public class KeepAwakePlugin: CAPPlugin, CAPBridgedPlugin {
             UIApplication.shared.isIdleTimerDisabled = enabled
             call.resolve()
         }
+    }
+}
+
+// Keep this in the app target's existing source file so archive builds include it.
+// iOS 27 requires scene lifecycle adoption for apps linked with the iOS 27 SDK.
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
+    var window: UIWindow?
+
+    func scene(_ scene: UIScene, willConnectTo session: UISceneSession,
+               options connectionOptions: UIScene.ConnectionOptions) {
+        guard scene is UIWindowScene else { return }
+        // UIKit creates the window and Capacitor controller from Main.storyboard.
+        // Preserve the delegate window used by integrations expecting it there.
+        (UIApplication.shared.delegate as? AppDelegate)?.window = window
+        forward(connectionOptions.urlContexts)
+        for activity in connectionOptions.userActivities {
+            forward(activity)
+        }
+    }
+
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        forward(URLContexts)
+    }
+
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        forward(userActivity)
+    }
+
+    private func forward(_ contexts: Set<UIOpenURLContext>) {
+        for context in contexts {
+            var options: [UIApplication.OpenURLOptionsKey: Any] = [
+                .openInPlace: context.options.openInPlace
+            ]
+            if let source = context.options.sourceApplication { options[.sourceApplication] = source }
+            if let annotation = context.options.annotation { options[.annotation] = annotation }
+            _ = ApplicationDelegateProxy.shared.application(UIApplication.shared, open: context.url, options: options)
+        }
+    }
+
+    private func forward(_ activity: NSUserActivity) {
+        _ = ApplicationDelegateProxy.shared.application(UIApplication.shared, continue: activity, restorationHandler: { _ in })
     }
 }
 

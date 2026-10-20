@@ -231,7 +231,7 @@ function ImageViewer({ src, onClose }: { src: string; onClose: () => void }) {
       {/* Top bar */}
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '12px 16px', paddingTop: 'max(12px, env(safe-area-inset-top))',
+        padding: '12px 16px', paddingTop: 'max(12px, var(--safe-top))',
         flexShrink: 0,
       }}>
         <button onClick={onClose} style={{
@@ -290,7 +290,7 @@ function ImageViewer({ src, onClose }: { src: string; onClose: () => void }) {
       {/* Bottom bar */}
       <div style={{
         display: 'flex', justifyContent: 'center', gap: 24,
-        padding: '12px 16px', paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+        padding: '12px 16px', paddingBottom: 'max(12px, var(--safe-bottom))',
         flexShrink: 0,
       }}>
         <button onClick={handleDownload} style={{
@@ -471,10 +471,11 @@ export default function Chat() {
   const openMessageMenu = useCallback((reply: ReplyReference, x: number, y: number) => {
     const menuWidth = 132
     const menuHeight = 52
+    const shell = document.getElementById('app-shell')?.getBoundingClientRect()
     setMessageMenu({
       reply,
-      x: Math.max(12, Math.min(x, window.innerWidth - menuWidth - 12)),
-      y: Math.max(12, Math.min(y, window.innerHeight - menuHeight - 12)),
+      x: Math.max(12, Math.min(x - (shell?.left ?? 0), (shell?.width ?? window.innerWidth) - menuWidth - 12)),
+      y: Math.max(12, Math.min(y - (shell?.top ?? 0), (shell?.height ?? window.innerHeight) - menuHeight - 12)),
     })
   }, [])
 

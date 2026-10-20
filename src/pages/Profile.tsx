@@ -16,7 +16,7 @@ import { deleteBarkEndpoint, getBarkStatus, normalizeBarkEndpoint, saveBarkEndpo
 import { getPlatform } from '../utils/platform'
 
 type SubView = null | 'password' | 'avatar' | '2fa' | 'sessions' | 'language' | 'fingerprint' | 'myqr' | 'message-privacy' | 'bark'
-const APP_VERSION = '3.1.1'
+const APP_VERSION = '3.1.2'
 
 export default function Profile() {
   const { t } = useI18n()
@@ -302,7 +302,7 @@ export default function Profile() {
         </div>
 
         <div style={{
-          padding: '0 16px max(24px, env(safe-area-inset-bottom))',
+          padding: '0 16px max(24px, var(--safe-bottom))',
           textAlign: 'center', color: 'var(--text-muted)',
           fontSize: 12, opacity: 0.65,
         }}>

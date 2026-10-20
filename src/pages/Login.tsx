@@ -337,7 +337,7 @@ export default function Login() {
 
   return (
     <div className="login-page">
-      <div className="login-card">
+      <div className="login-card login-card--primary">
         <div className="login-brand">
           <div className="login-logo">
             <img src="/icons/icon-512.png" alt="PaperPhoneLite" className="login-logo-img" />

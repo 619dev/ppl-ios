@@ -1,19 +1,22 @@
 # PaperPhoneLite for iOS
 
-The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.1.1.
+The iOS client for PaperPhoneLite. It is built with React, TypeScript, Vite, and Capacitor. The shared frontend tracks the `client/` directory of [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite), with platform adaptations informed by the matching Android client. The current release is PaperPhoneLite iOS 3.1.2.
 
 [中文](README.md) · [Changelog](changelog.md) · [AGPL-3.0 License](LICENSE)
 
-Current iOS release: `3.1.1 (57)`; bundle ID: `com.fm619tech.paperphonelite`.
+Current iOS release: `3.1.2 (58)`; bundle ID: `com.fm619tech.paperphonelite`.
 
-## 3.1.1 release highlights
+## 3.1.2 release highlights
 
+- Fixed the post-login blank screen by waiting for local crypto restoration without a login/chats redirect loop.
+- Ported iPhone 17 / Duo adaptations from Plus iOS commit `1a78a3d`: shared safe areas, keyboard avoidance, landscape support, and scene lifecycle.
+- Added a conversation sidebar based on available content bounds, with two-column login and scrolling in short windows.
 - Removed the unused proxy settings entry and subpage from Profile.
 - Synchronized upstream `9bf6aaf` (3.1.0), adding signed private messages, contact identity verification, and identity-change notices.
 - Added signed groups, trusted-member checks, sender-key rotation, and offline history recovery across key epochs.
 - Improved paginated message sync, cache-before-cursor persistence, and account isolation.
 - Added security text in eight languages and the upstream security regression tests.
-- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.1 (57).
+- Preserved iOS Tor, Keychain, Bark, local notifications, Share Extension, and iPad adaptations; updated to 3.1.2 (58).
 
 ## Privacy and network model
 
@@ -79,7 +82,7 @@ The project does not depend on `@capacitor/push-notifications`.
 
 ## Build
 
-Requirements: Node.js 22+, npm 9+, CocoaPods, Xcode 26+, and macOS.
+Requirements: Node.js 22+, npm 9+, CocoaPods, Xcode 27.1+, and macOS.
 
 ```bash
 git clone https://github.com/619dev/ppl-ios
@@ -112,7 +115,7 @@ xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
   -derivedDataPath /tmp/ppl-ios-derived CODE_SIGNING_ALLOWED=NO build
 ```
 
-See [test coverage and limitations](tests/README.md). This 3.1.0 update passed the frontend build, security regressions, checks for 92 security text keys across eight languages, and unsigned device-target compilation of the app and Share Extension. Unsigned output is not a distribution build; live device interoperability remains untested. A subsequent simulator build with `CODE_SIGNING_ALLOWED=YES` succeeded and the app was launched.
+See [test coverage and limitations](tests/README.md) and [device adaptation checks](tests/ios-device-compatibility.md). The adaptation passed the frontend build, security regressions, 92 security text keys across eight languages, and an unsigned Xcode 27.1 simulator build. The Duo outer-display login launched and was inspected in a screenshot. Inner displays, folding, software-keyboard interactions, and signed-in split views still require acceptance testing. Unsigned output is not a distribution build; physical-device and live-server interoperability remain untested.
 
 Capacitor plugins use Swift Package Manager; Tor and IPtProxy use CocoaPods. Keep both dependency systems and build the workspace. After frontend changes, rebuild and run `cap sync ios` to update bundled native resources.
 

@@ -1,19 +1,22 @@
 # PaperPhoneLite iOS 客户端
 
-PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.1.1。
+PaperPhoneLite 的 iOS 客户端。项目使用 React、TypeScript、Vite 与 Capacitor 构建，公共前端以上游 [619dev/PaperPhoneLite](https://github.com/619dev/PaperPhoneLite) 的 `client/` 目录为基线，并参考同版本 Android 客户端进行平台适配。当前版本为 PaperPhoneLite iOS 3.1.2。
 
 [English](README_EN.md) · [更新日志](changelog.md) · [AGPL-3.0 许可证](LICENSE)
 
-当前 iOS 版本：`3.1.1 (57)`；Bundle ID：`com.fm619tech.paperphonelite`。
+当前 iOS 版本：`3.1.2 (58)`；Bundle ID：`com.fm619tech.paperphonelite`。
 
-## 3.1.1 更新摘要
+## 3.1.2 更新摘要
 
+- 修复登录后的白屏：恢复本地加密状态期间显示加载页，避免登录与聊天路由循环跳转。
+- 吸收 Plus iOS 提交 `1a78a3d` 的 iPhone 17 / Duo 适配：统一安全区、键盘避让、横屏与场景生命周期。
+- 按内容区域大小切换会话侧栏和单栏布局；登录页支持宽屏双栏及短窗口滚动。
 - 移除个人信息页已无用途的代理设置入口及子页面。
 - 同步上游 `9bf6aaf`（3.1.0），加入私聊消息签名、联系人身份验证与身份变化提示。
 - 加入群组签名、可信成员校验、发送密钥轮换及多密钥时期的离线历史恢复。
 - 完善消息分页同步、缓存落盘后推进游标及跨账号任务隔离。
 - 补充八种语言的安全提示和上游安全回归测试。
-- 保留 iOS Tor、Keychain、Bark、本地通知、分享扩展与 iPad 适配；版本更新为 3.1.1（57）。
+- 保留 iOS Tor、Keychain、Bark、本地通知、分享扩展与 iPad 适配；版本更新为 3.1.2（58）。
 
 ## 隐私与网络模型
 
@@ -79,7 +82,7 @@ PaperPhoneLite 的生产服务运行在 Tor v3 onion service 上。服务器的�
 
 ## 构建
 
-要求 Node.js 22+、npm 9+、CocoaPods、Xcode 26+ 与 macOS。
+要求 Node.js 22+、npm 9+、CocoaPods、Xcode 27.1+ 与 macOS。
 
 ```bash
 git clone https://github.com/619dev/ppl-ios
@@ -112,7 +115,7 @@ xcodebuild -workspace ios/App/App.xcworkspace -scheme App \
   -derivedDataPath /tmp/ppl-ios-derived CODE_SIGNING_ALLOWED=NO build
 ```
 
-测试范围与限制见 [测试说明](tests/README.md)。本次 3.1.0 更新已通过前端构建、安全回归、92 个安全文本键的八语言检查，以及 App 和分享扩展的无签名真机目标编译。无签名编译产物不能直接用于发行；尚未完成真机联调。后续已使用 `CODE_SIGNING_ALLOWED=YES` 编译并在模拟器中启动应用。
+测试范围与限制见 [测试说明](tests/README.md) 与 [设备适配验收记录](tests/ios-device-compatibility.md)。本次适配已通过前端构建、安全回归、92 个安全文本键的八语言检查，以及 Xcode 27.1 无签名模拟器构建；Duo 外屏登录页已启动并截图检查。内屏、折叠切换、软件键盘与已登录双栏流程仍待验收。无签名产物不能直接用于发行，真机与服务器联调尚未完成。
 
 Capacitor 插件通过 Swift Package Manager 接入，Tor 与 IPtProxy 通过 CocoaPods 接入。必须保留两套依赖并使用 workspace 构建；修改前端后重新构建并执行 `cap sync ios`，以更新原生项目内的资源。
 

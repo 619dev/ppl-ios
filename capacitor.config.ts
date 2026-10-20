@@ -18,7 +18,8 @@ const config: CapacitorConfig = {
     },
   },
   ios: {
-    contentInset: 'automatic',
+    // HTML applies native safe areas once; the container handles the keyboard.
+    contentInset: 'never',
     allowsLinkPreview: false,
     scrollEnabled: false,
   },

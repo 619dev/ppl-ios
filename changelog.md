@@ -4,6 +4,20 @@ All notable changes and new features are recorded here. Historical entries below
 
 所有重要版本改动和新特性统一记录于此。下方历史条目由仓库原有文档迁移而来。
 
+## 3.1.2 (iOS build 58) — 2026-10-20
+
+- Fixed a blank screen after login: wait for local crypto hydration on the requested route instead of bouncing between login and chats and triggering WebKit’s history replacement limit. Added session-gate regression coverage.
+- 修复登录后白屏：本地加密状态恢复期间显示加载页，避免登录页与聊天页循环跳转触发 WebKit 历史记录频率限制，并增加会话路由回归测试。
+
+- Ported iPhone 17 / Duo adaptations from Plus iOS commit `1a78a3d`: native safe areas, keyboard avoidance, landscape, scene lifecycle, adaptive conversation sidebar, and scrollable two-column login.
+- Preserved Lite's Tor integration and custom routing. Updated the app, Share Extension, Profile footer, network user agent, and package metadata to 3.1.2 (58).
+- Updated all maintained guides and device acceptance notes. Frontend, security/localization checks, and Xcode 27.1 simulator compilation passed for the adaptation; Duo outer-display login was inspected. Folding, keyboard, signed-in flows, and physical-device checks remain pending.
+- 吸收 Plus iOS 提交 `1a78a3d` 的 iPhone 17 / Duo 适配，包括原生安全区、键盘避让、横屏、场景生命周期、自适应会话侧栏及可滚动双栏登录页。
+- 保留 Lite 的 Tor 集成与自定义路由；App、分享扩展、个人信息页底部、网络请求标识及软件包版本统一更新为 3.1.2（58）。
+- 更新全部维护中的说明及设备验收记录。适配已通过前端、安全、多语言检查和 Xcode 27.1 模拟器编译，已检查 Duo 外屏登录页；折叠、键盘、已登录流程及真机验收仍待完成。
+
+---
+
 ## 3.1.1 (iOS build 57) — 2026-10-17
 
 - Removed the unused proxy settings entry and subpage from Profile.

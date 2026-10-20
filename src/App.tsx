@@ -16,6 +16,7 @@ import GroupInfo from './pages/GroupInfo'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfUse from './pages/TermsOfUse'
 import TabBar from './components/TabBar'
+import SessionGate from './components/SessionGate'
 import NotificationToast from './components/NotificationToast'
 import { get, post } from './api/http'
 import { getPlatform, isNativePlatform } from './utils/platform'
@@ -26,6 +27,18 @@ import { useI18n } from './hooks/useI18n'
 import { isNativeTorPlatform, onTorStatusChange, startTor } from './api/tor-bridge'
 
 function ProtectedLayout() {
+  const [wideWorkspace, setWideWorkspace] = useState(false)
+  const { t } = useI18n()
+  useEffect(() => {
+    const shell = document.getElementById('app-shell')
+    if (!shell) return
+    const update = () => setWideWorkspace(shell.clientWidth >= 760 && shell.clientHeight >= 460)
+    const observer = new ResizeObserver(update)
+    observer.observe(shell)
+    update()
+    return () => observer.disconnect()
+  }, [])
+
   useSocket()
   useAutoDeleteCleanup()
   const totalUnread = useStore(state =>
@@ -80,8 +93,14 @@ function ProtectedLayout() {
 
   return (
     <>
+        <div className={`adaptive-workspace${wideWorkspace ? ' is-wide' : ''}`}>
+          {wideWorkspace && <aside className="workspace-sidebar" aria-label={t('chats.title')}>
+            <Chats />
+            <TabBar alwaysVisible />
+          </aside>}
+          <main className="workspace-main">
         <Routes>
-          <Route path="/chats" element={<Chats />} />
+          <Route path="/chats" element={wideWorkspace ? <div className="workspace-welcome"><div className="workspace-welcome-mark">PaperPhoneLite</div><p>{t('chats.empty_hint')}</p></div> : <Chats />} />
           <Route path="/chat/:id" element={<Chat />} />
           <Route path="/contacts" element={<Contacts />} />
           <Route path="/discover" element={<Discover />} />
@@ -92,7 +111,9 @@ function ProtectedLayout() {
           <Route path="/terms" element={<TermsOfUse />} />
           <Route path="*" element={<Navigate to="/chats" replace />} />
         </Routes>
-        <TabBar />
+        {!wideWorkspace && <TabBar />}
+          </main>
+        </div>
         <NotificationToast />
     </>
   )
@@ -147,6 +168,11 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    if (getPlatform() === 'ios') {
+      import('@capacitor/status-bar').then(({ StatusBar, Style }) =>
+        StatusBar.setStyle({ style: theme === 'dark' ? Style.Dark : Style.Light })
+      ).catch(() => undefined)
+    }
   }, [theme])
 
   useEffect(() => {
@@ -272,10 +298,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={token ? <Navigate to="/chats" replace /> : <Login />} />
+        <Route path="/login" element={token && user?.id ? <Navigate to="/chats" replace /> : <Login />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfUse />} />
-        <Route path="/*" element={token && user?.id && hydratedAccount === user.id ? <ProtectedLayout /> : <Navigate to="/login" replace />} />
+        <Route path="/*" element={<SessionGate
+          authenticated={Boolean(token && user?.id)}
+          hydrated={Boolean(user?.id && hydratedAccount === user.id)}
+          loadingLabel={t('common.loading')}
+        ><ProtectedLayout /></SessionGate>} />
       </Routes>
       {showPresentationUnlock && (
         <div className="modal-overlay" role="presentation">
